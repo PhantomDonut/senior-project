@@ -1,0 +1,37 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ba1d1c06ac51f8545bba647191047a80, type: 3}
+  m_Name: tt_data
+  m_EditorClassIdentifier: 
+  entries:
+  - timeBeganDate: 2/10/2018 8:16:19 AM
+    timeBegan: 63653847379
+    time: 671
+  - timeBeganDate: 1/18/2021 1:33:59 PM
+    timeBegan: 63746573639
+    time: 141
+  - timeBeganDate: 1/18/2021 1:38:19 PM
+    timeBegan: 63746573899
+    time: 305
+  settings:
+    showSettingsOnStartup: 0
+    show: 1
+    deadline: 3/10/2018 12:00:00 AM
+    restPeriod: 60
+    restLength: 2
+    hoursPerDay: 4.5
+    salaryPerHour: 25
+    displayDeadline: 1
+    displaySalary: 1
+    displayDays: 1
+    displayThisWeek: 1
+    displayTotal: 1
