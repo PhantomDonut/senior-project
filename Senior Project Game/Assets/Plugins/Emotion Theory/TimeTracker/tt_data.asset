@@ -36,10 +36,121 @@ MonoBehaviour:
     time: 1440
   - timeBeganDate: 1/18/2021 2:25:54 PM
     timeBegan: 63746576754
-    time: 733
+    time: 977
+  - timeBeganDate: 1/20/2021 5:28:11 PM
+    timeBegan: 63746760491
+    time: 853
+  - timeBeganDate: 1/20/2021 5:42:57 PM
+    timeBegan: 63746761377
+    time: 0
+  - timeBeganDate: 1/21/2021 12:45:14 PM
+    timeBegan: 63746829914
+    time: 226
+  - timeBeganDate: 1/21/2021 12:49:18 PM
+    timeBegan: 63746830158
+    time: 482
+  - timeBeganDate: 1/21/2021 12:57:52 PM
+    timeBegan: 63746830672
+    time: 488
+  - timeBeganDate: 1/21/2021 3:49:10 PM
+    timeBegan: 63746840950
+    time: 2430
+  - timeBeganDate: 1/21/2021 4:31:29 PM
+    timeBegan: 63746843489
+    time: 672
+  - timeBeganDate: 1/21/2021 4:42:51 PM
+    timeBegan: 63746844171
+    time: 157
+  - timeBeganDate: 1/21/2021 4:48:18 PM
+    timeBegan: 63746844498
+    time: 488
+  - timeBeganDate: 1/21/2021 10:34:50 PM
+    timeBegan: 63746865290
+    time: 610
+  - timeBeganDate: 1/22/2021 10:52:15 AM
+    timeBegan: 63746909535
+    time: 610
+  - timeBeganDate: 1/22/2021 1:39:13 PM
+    timeBegan: 63746919553
+    time: 602
+  - timeBeganDate: 1/22/2021 2:09:20 PM
+    timeBegan: 63746921360
+    time: 0
+  - timeBeganDate: 1/23/2021 3:22:26 PM
+    timeBegan: 63747012146
+    time: 1887
+  - timeBeganDate: 1/23/2021 3:56:39 PM
+    timeBegan: 63747014199
+    time: 103
+  - timeBeganDate: 1/23/2021 4:02:23 PM
+    timeBegan: 63747014543
+    time: 59
+  - timeBeganDate: 1/23/2021 4:05:01 PM
+    timeBegan: 63747014701
+    time: 1056
+  - timeBeganDate: 1/23/2021 4:26:39 PM
+    timeBegan: 63747015999
+    time: 59
+  - timeBeganDate: 1/23/2021 4:27:44 PM
+    timeBegan: 63747016064
+    time: 61
+  - timeBeganDate: 1/23/2021 4:32:34 PM
+    timeBegan: 63747016354
+    time: 279
+  - timeBeganDate: 1/23/2021 4:40:28 PM
+    timeBegan: 63747016828
+    time: 59
+  - timeBeganDate: 1/23/2021 4:48:05 PM
+    timeBegan: 63747017285
+    time: 252
+  - timeBeganDate: 1/23/2021 4:56:19 PM
+    timeBegan: 63747017779
+    time: 59
+  - timeBeganDate: 1/23/2021 5:21:57 PM
+    timeBegan: 63747019317
+    time: 0
+  - timeBeganDate: 1/23/2021 5:25:51 PM
+    timeBegan: 63747019551
+    time: 183
+  - timeBeganDate: 1/23/2021 6:02:13 PM
+    timeBegan: 63747021733
+    time: 254
+  - timeBeganDate: 1/23/2021 6:07:04 PM
+    timeBegan: 63747022024
+    time: 3575
+  - timeBeganDate: 1/23/2021 7:07:03 PM
+    timeBegan: 63747025623
+    time: 1268
+  - timeBeganDate: 1/23/2021 7:45:39 PM
+    timeBegan: 63747027939
+    time: 0
+  - timeBeganDate: 1/23/2021 8:31:02 PM
+    timeBegan: 63747030662
+    time: 805
+  - timeBeganDate: 1/23/2021 8:47:11 PM
+    timeBegan: 63747031631
+    time: 4174
+  - timeBeganDate: 1/23/2021 9:57:45 PM
+    timeBegan: 63747035865
+    time: 671
+  - timeBeganDate: 1/23/2021 11:24:13 PM
+    timeBegan: 63747041053
+    time: 2206
+  - timeBeganDate: 1/24/2021 12:00:59 AM
+    timeBegan: 63747043259
+    time: 516
+  - timeBeganDate: 1/24/2021 12:13:36 AM
+    timeBegan: 63747044016
+    time: 59
+  - timeBeganDate: 1/24/2021 12:19:55 AM
+    timeBegan: 63747044395
+    time: 88
+  - timeBeganDate: 1/24/2021 12:24:01 AM
+    timeBegan: 63747044641
+    time: 0
   settings:
     showSettingsOnStartup: 0
-    show: 1
+    show: 0
     deadline: 3/10/2018 12:00:00 AM
     restPeriod: 60
     restLength: 2
