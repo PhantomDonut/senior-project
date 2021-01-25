@@ -13,9 +13,6 @@ MonoBehaviour:
   m_Name: tt_data
   m_EditorClassIdentifier: 
   entries:
-  - timeBeganDate: 2/10/2018 8:16:19 AM
-    timeBegan: 63653847379
-    time: 671
   - timeBeganDate: 1/18/2021 1:33:59 PM
     timeBegan: 63746573639
     time: 141
@@ -162,7 +159,40 @@ MonoBehaviour:
     time: 1419
   - timeBeganDate: 1/24/2021 1:03:45 PM
     timeBegan: 63747090225
-    time: 549
+    time: 2865
+  - timeBeganDate: 1/24/2021 1:52:07 PM
+    timeBegan: 63747093127
+    time: 609
+  - timeBeganDate: 1/24/2021 2:03:48 PM
+    timeBegan: 63747093828
+    time: 1964
+  - timeBeganDate: 1/24/2021 2:36:56 PM
+    timeBegan: 63747095816
+    time: 3366
+  - timeBeganDate: 1/24/2021 3:37:04 PM
+    timeBegan: 63747099424
+    time: 59
+  - timeBeganDate: 1/24/2021 3:45:26 PM
+    timeBegan: 63747099926
+    time: 0
+  - timeBeganDate: 1/24/2021 6:37:24 PM
+    timeBegan: 63747110244
+    time: 694
+  - timeBeganDate: 1/24/2021 6:54:15 PM
+    timeBegan: 63747111255
+    time: 76
+  - timeBeganDate: 1/24/2021 6:56:07 PM
+    timeBegan: 63747111367
+    time: 62
+  - timeBeganDate: 1/24/2021 6:57:58 PM
+    timeBegan: 63747111478
+    time: 70
+  - timeBeganDate: 1/24/2021 6:59:21 PM
+    timeBegan: 63747111561
+    time: 168
+  - timeBeganDate: 1/24/2021 7:02:44 PM
+    timeBegan: 63747111764
+    time: 367
   settings:
     showSettingsOnStartup: 0
     show: 0

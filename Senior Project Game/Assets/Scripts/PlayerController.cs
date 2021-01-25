@@ -27,6 +27,7 @@ public class PlayerController : MonoBehaviour {
     [Header("Collision")]
     public LayerMask ground;
     public bool grounded;
+    private bool groundedLastFrame;
     public float heightPadding = 0.05f;
     new Rigidbody rigidbody;
     Bounds bounds;
@@ -47,6 +48,7 @@ public class PlayerController : MonoBehaviour {
     Quaternion targetRotation;
     public bool debug;
     public TextMeshProUGUI debugText;
+    public TextMeshProUGUI jumpCounterText;
     private const string debugTextFormat = "Velocity: {3}\nGrounded: {0}\nSliding: {1} & {2} @ {5}\nVertical Velocity: {4}";
 
     private Animator animator;
@@ -61,6 +63,9 @@ public class PlayerController : MonoBehaviour {
         minJumpVelocity = Mathf.Sqrt(2 * Mathf.Abs(gravity.y) * minJumpHeight);
 
         animator = transform.GetChild(0).GetChild(0).GetComponent<Animator>();
+
+        rigidbody.centerOfMass = new Vector3(0, 0, 0);
+        rigidbody.inertiaTensor = new Vector3(1, 1, 1);
     }
 
     Vector3 movementTotal;
@@ -72,6 +77,17 @@ public class PlayerController : MonoBehaviour {
         CheckGround();
         CalculateGroundAngle();
         ApplyGravity();
+
+        animator.SetBool("Grounded", grounded);
+        bool running = !Input.GetKey(KeyCode.LeftShift);
+        speed = running ? runSpeed : walkSpeed;
+        animator.SetBool("Walking", (input.x != 0 || input.y != 0) & !running);
+        animator.SetBool("Running", (input.x != 0 || input.y != 0) & running);
+        animator.SetBool("Sliding", isSliding);
+
+        jumpsRemaining = grounded ? isSliding ? 1 : maxJumps : jumpsRemaining;
+        jumpCounterText.text = string.Format("Jumps: {0}", jumpsRemaining);
+
 
         if (debug) DrawDebugLines();
 
@@ -89,6 +105,7 @@ public class PlayerController : MonoBehaviour {
                 jumpsRemaining--;
                 StartCoroutine(JumpReset());
                 verticalVelocity.y = maxJumpVelocity;
+                animator.SetTrigger("JumpUp");
                 if (isSliding) {
                     verticalVelocity.x += slideVelocity.normalized.x * currentSlideAcceleration * 0.9f;
                     verticalVelocity.z += slideVelocity.normalized.z * currentSlideAcceleration * 0.9f;
@@ -126,17 +143,6 @@ public class PlayerController : MonoBehaviour {
     private void GetInput() {
         input.x = Input.GetAxisRaw("Horizontal");
         input.y = Input.GetAxisRaw("Vertical");
-
-        if(input.x != 0 || input.y != 0) {
-            animator.SetBool("Walking", true);
-        } else {
-            animator.SetBool("Walking", false);
-        }
-
-        bool running = !Input.GetKey(KeyCode.LeftShift);
-        speed = running ? runSpeed : walkSpeed;
-        animator.SetBool("Walking", (input.x != 0 || input.y != 0) & !running);
-        animator.SetBool("Running", (input.x != 0 || input.y != 0) & running);
     }
 
     private void CalculateDirection() {
@@ -183,15 +189,19 @@ public class PlayerController : MonoBehaviour {
     }
 
     void CheckGround() {
+        groundedLastFrame = grounded;
         if(Physics.BoxCast(transform.position, new Vector3(bounds.extents.x, 0.0125f, bounds.extents.z), -Vector3.up, out hitInfo, transform.rotation, height + heightPadding, ground) && !justJumped) {
             if(Vector3.Distance(transform.position, hitInfo.point) < height) {
                 //Keep position leveled to the ground to prevent clipping
                 transform.position = Vector3.Lerp(transform.position, transform.position + Vector3.up * height, 5 * Time.deltaTime);
             }
             grounded = true;
-            jumpsRemaining = maxJumps;
         } else {
             grounded = false;
+        }
+        if (!groundedLastFrame && grounded) {
+            //Landing frame
+            animator.SetTrigger("Landing");
         }
     }
 
