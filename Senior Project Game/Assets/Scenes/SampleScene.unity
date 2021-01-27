@@ -1392,6 +1392,7 @@ MonoBehaviour:
   debug: 1
   debugText: {fileID: 995288355}
   jumpCounterText: {fileID: 1399067579}
+  friction: 1
 --- !u!54 &707752240
 Rigidbody:
   m_ObjectHideFlags: 0

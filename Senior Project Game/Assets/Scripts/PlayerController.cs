@@ -54,6 +54,9 @@ public class PlayerController : MonoBehaviour {
 
     private Animator animator;
 
+    [SerializeField] [Range(0, 1)] private float friction = 1;
+    private Vector3 velocityPrior;
+
     private void Start() {
         playerCamera = Camera.main.GetComponent<CameraController>();
         rigidbody = GetComponent<Rigidbody>();
@@ -122,10 +125,11 @@ public class PlayerController : MonoBehaviour {
                 verticalVelocity.y = minJumpVelocity;
             }
         }
-        
 
-       
-       rigidbody.velocity = movementTotal + verticalVelocity;
+        Vector3 frameVelocity = movementTotal + verticalVelocity;
+        frameVelocity = new Vector3(Mathf.Lerp(velocityPrior.x, frameVelocity.x, friction), frameVelocity.y, Mathf.Lerp(velocityPrior.z, frameVelocity.z, friction));
+        rigidbody.velocity = frameVelocity;
+        velocityPrior = frameVelocity;
 
     }
 
@@ -218,6 +222,7 @@ public class PlayerController : MonoBehaviour {
         isSliding = groundAngle > maxGroundAngle;
         if (isSliding) {
             slideVelocity = Vector3.Cross(Vector3.Cross(Vector3.up, hitInfo.normal), hitInfo.normal) * currentSlideAcceleration;
+            Debug.Log("Slide Angle is " + Vector3.Cross(Vector3.Cross(Vector3.up, hitInfo.normal), hitInfo.normal));
         } else {
             slideVelocity = Vector3.zero;
         }

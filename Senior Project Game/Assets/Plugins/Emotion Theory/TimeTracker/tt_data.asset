@@ -235,6 +235,27 @@ MonoBehaviour:
   - timeBeganDate: 1/25/2021 10:30:14 PM
     timeBegan: 63747210614
     time: 0
+  - timeBeganDate: 1/26/2021 8:48:17 PM
+    timeBegan: 63747290897
+    time: 2687
+  - timeBeganDate: 1/26/2021 9:40:38 PM
+    timeBegan: 63747294038
+    time: 122
+  - timeBeganDate: 1/26/2021 9:44:54 PM
+    timeBegan: 63747294294
+    time: 122
+  - timeBeganDate: 1/26/2021 11:12:22 PM
+    timeBegan: 63747299542
+    time: 244
+  - timeBeganDate: 1/26/2021 11:20:00 PM
+    timeBegan: 63747300000
+    time: 380
+  - timeBeganDate: 1/26/2021 11:26:37 PM
+    timeBegan: 63747300397
+    time: 427
+  - timeBeganDate: 1/26/2021 11:36:21 PM
+    timeBegan: 63747300981
+    time: 183
   settings:
     showSettingsOnStartup: 0
     show: 0
