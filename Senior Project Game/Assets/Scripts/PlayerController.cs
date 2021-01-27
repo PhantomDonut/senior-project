@@ -9,6 +9,7 @@ public class PlayerController : MonoBehaviour {
     public float speed = 5;
     [SerializeField] private float walkSpeed;
     [SerializeField] private float runSpeed;
+    [SerializeField] private float sprintSpeed;
     private Vector2 input;
     public float height = 0.5f;
     Vector3 forward;
@@ -80,9 +81,11 @@ public class PlayerController : MonoBehaviour {
 
         animator.SetBool("Grounded", grounded);
         bool running = !Input.GetKey(KeyCode.LeftShift);
-        speed = running ? runSpeed : walkSpeed;
+        bool sprinting = running && Input.GetKey(KeyCode.LeftControl);
+        speed = running ? sprinting ? sprintSpeed : runSpeed : walkSpeed;
         animator.SetBool("Walking", (input.x != 0 || input.y != 0) & !running);
-        animator.SetBool("Running", (input.x != 0 || input.y != 0) & running);
+        animator.SetBool("Running", (input.x != 0 || input.y != 0) & running & !sprinting);
+        animator.SetBool("Sprinting", (input.x != 0 || input.y != 0) & sprinting);
         animator.SetBool("Sliding", isSliding);
 
         jumpsRemaining = grounded ? isSliding ? 1 : maxJumps : jumpsRemaining;
