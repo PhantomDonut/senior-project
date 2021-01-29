@@ -2,7 +2,7 @@
 using System.Collections;
 
 [RequireComponent(typeof(Controller2D))]
-public class Player : Singleton<Player> {
+public class Player : MonoBehaviour {
 
     [Header("Basic Movement")]
     public float baseMoveSpeed = 4;
@@ -40,8 +40,6 @@ public class Player : Singleton<Player> {
     public int freeplayColorStep = 0;
 
     private AudioSource swapSound;
-
-    public ColorSwatch color = ColorSwatch.Blue;
 
     //public Stat health;
 
@@ -83,17 +81,6 @@ public class Player : Singleton<Player> {
                 jumpKeyDownQueued = true;
             if (inputManager.JumpKeyUp)
                 jumpKeyUpQueued = true;
-            if ((Input.GetMouseButtonDown(0) || Input.GetKeyDown(KeyCode.E)) && !wallSliding && !isAttackState) {
-                StartCoroutine(Attack());
-            }
-            if(Input.GetKeyDown(inputManager.FreeplayColor) && freeplay) {
-                freeplayColorStep++;
-                if(freeplayColorStep > ColorManager.Instance.colors.Length - 1) {
-                    freeplayColorStep = 0;
-                }
-                ChangeColor((ColorSwatch)freeplayColorStep, true);
-                swapSound.Play();
-            }
         }
     }
 
@@ -203,51 +190,5 @@ public class Player : Singleton<Player> {
             animator.SetBool("isAttack", false);
 
         GameManager.Instance.SendPlayerData(isWalking, isSprinting, isAirborne, wallSliding, transform.position, transform.rotation, wallSlideOverrideFix ? false : facingRight, color);
-    }
-
-    IEnumerator Attack() {
-        animator.SetBool("isAttack", true);
-        isAttackState = true;
-        RaycastHit2D[] hits = Physics2D.BoxCastAll(new Vector2(transform.position.x, transform.position.y + 1f), new Vector2(0.5f, 3), 0f, facingRight ? Vector2.right : Vector2.left, 1.5f);
-        for(int i = 0; i < hits.Length; i++) {
-            AttackCollisionTriggered(hits[i]);
-        }
-        yield return new WaitForSeconds(attackLength);
-        animator.SetBool("isAttack", false);
-
-        yield return new WaitForSeconds(0.15f);
-        isAttackState = false;
-    }
-    public void AttackCollisionTriggered(RaycastHit2D hit) {
-        if (isAttackState && hit.transform.GetComponent<IInteractable>() != null) {
-            hit.transform.GetComponent<IInteractable>().Interact();
-            Debug.Log(hit.transform.name);
-        }
-    }
-
-    void AnimateCharacterRewind(PlayerFrameState playerFrameState) {
-        if(playerFrameState == null)
-            return;
-        transform.position = playerFrameState.position;
-        //transform.rotation = playerFrameState.rotation;
-        if (playerFrameState.facingRight) {
-            visual.transform.rotation = Quaternion.Euler(visual.transform.rotation.x, 0, visual.transform.rotation.z);
-        }
-        else if (!playerFrameState.facingRight) {
-            visual.transform.rotation = Quaternion.Euler(visual.transform.rotation.x, 180, visual.transform.rotation.z);
-        }
-        animator.SetBool("isWalking", playerFrameState.isWalking && !playerFrameState.isWallSliding && !playerFrameState.isSprinting);
-        animator.SetBool("isSprinting", playerFrameState.isSprinting && playerFrameState.isWalking && !playerFrameState.isWallSliding);
-        animator.SetBool("isAirborne", playerFrameState.isAirborne);
-        animator.SetBool("isWallSliding", playerFrameState.isWallSliding);
-        ChangeColor(playerFrameState.color);
-    }
-
-    public void ChangeColor(ColorSwatch colorInput, bool alwaysChange = false) {
-        if (alwaysChange || color != colorInput) {
-            material.SetColor("_Color", ColorManager.Instance.FetchColor(colorInput));
-            color = colorInput;
-            ColorManager.Instance.UpdateAllColorObjects(color);
-        }
     }
 }
