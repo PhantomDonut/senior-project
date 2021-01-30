@@ -11,6 +11,7 @@ public class PlayerController : MonoBehaviour {
     float height = 1;
     RaycastHit hitInfo;
     private CollisionInfo collisionInfo;
+    new Rigidbody rigidbody;
 
     Vector3 movementVelocity;
     Vector3 verticalVelocity;
@@ -36,6 +37,7 @@ public class PlayerController : MonoBehaviour {
     private const string debugTextFormat = "Velocity: {3}\nGrounded: {0}\nSliding: {1} & {2} @ {5}\nVertical Velocity: {4}";
 
     private void Start() {
+        rigidbody = GetComponent<Rigidbody>();
         bounds = GetComponent<CapsuleCollider>().bounds;
         height = 0.5f;
     }
@@ -102,30 +104,51 @@ public class PlayerController : MonoBehaviour {
         collisionInfo.groundedLastFrame = collisionInfo.grounded;
         friction = 1;
 
+        Surface hitSurface = null;
         if (Physics.BoxCast(transform.position, new Vector3(bounds.extents.x, 0.0125f, bounds.extents.z), -Vector3.up, out hitInfo, transform.rotation, height + heightPadding, ground) && !justJumped) {
             if (Vector3.Distance(transform.position, hitInfo.point) < height) {
                 //Keep position leveled to the ground to prevent clipping
                 transform.position = Vector3.Lerp(transform.position, transform.position + Vector3.up * height, 5 * Time.deltaTime);
             }
-            if (hitInfo.transform.gameObject.GetComponent<Surface>() != null) friction = hitInfo.transform.gameObject.GetComponent<Surface>().friction;
+            hitSurface = hitInfo.transform.gameObject.GetComponent<Surface>();
+            if (hitSurface != null) {
+                friction = hitSurface.friction;
+                if(hitSurface.GetType() == typeof(MotionPlatform)) {
+                    transform.SetParent(hitSurface.transform);
+                    rigidbody.interpolation = RigidbodyInterpolation.None;
+                }
+            }
             collisionInfo.grounded = true;
         }
         else {
             collisionInfo.grounded = false;
         }
+
         //Detect passthrough platform
         RaycastHit passthroughBoxcast;
-        Surface currentSurface = null;
         if (Physics.BoxCast(transform.position, new Vector3(bounds.extents.x, 0.0125f, bounds.extents.z), -Vector3.up, out passthroughBoxcast, transform.rotation, height + heightPadding, translucentLayers)) {
             if(passthroughBoxcast.transform != null) {
-                currentSurface = passthroughBoxcast.transform.GetComponent<Surface>();
-                currentSurface.PlayerAbove(true);
+                hitSurface = passthroughBoxcast.transform.GetComponent<Surface>();
+                hitSurface.PlayerAbove(true);
+
+                friction = hitSurface.friction;
+                if (hitSurface.GetType() == typeof(MotionPlatform)) {
+                    transform.SetParent(hitSurface.transform);
+                    rigidbody.interpolation = RigidbodyInterpolation.None;
+                }
             }
         }
 
-        if (currentSurface != lastFrameSurface && lastFrameSurface != null) lastFrameSurface.PlayerAbove(false);
-        lastFrameSurface = currentSurface;
-        
+        //Debug.Log(hitSurface != null ? hitSurface.name : "Null");
+
+        if (hitSurface != lastFrameSurface && lastFrameSurface != null) {
+            lastFrameSurface.PlayerAbove(false);
+            if (lastFrameSurface.GetType() == typeof(MotionPlatform)) {
+                transform.SetParent(null);
+                rigidbody.interpolation = RigidbodyInterpolation.Interpolate;
+            }
+        }
+        lastFrameSurface = hitSurface;
     }
 
     void CalculateGroundAngle() {

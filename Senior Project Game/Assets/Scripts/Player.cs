@@ -72,7 +72,10 @@ public class Player : MonoBehaviour {
             }
         }
 
-        jumpsRemaining = collisionInfo.grounded ? collisionInfo.sliding ? 1 : maxJumps : jumpsRemaining;
+        if (!collisionInfo.groundedLastFrame && collisionInfo.grounded) {
+            //Update jumps on landing frame
+            jumpsRemaining = collisionInfo.grounded ? (collisionInfo.sliding || collisionInfo.slidingLastFrame) ? 1 : maxJumps : jumpsRemaining;
+        }
         jumpCounterText.text = string.Format("Jumps: {0}", jumpsRemaining);
 
         collisionInfo = playerController.CalculateFrameVelocity(input, speed, validJump, inputManager.JumpKeyUp, justJumped);
@@ -120,9 +123,9 @@ public class Player : MonoBehaviour {
     
 
     void DrawDebugLines() {
-        //Debug.DrawLine(transform.position, transform.position + forward * height * 2, Color.blue);
-        //Debug.DrawLine(transform.position, transform.position - Vector3.up * height, Color.green);
-        //Debug.DrawLine(transform.position, transform.position - Vector3.up * height * 2f, Color.red);
+        Debug.DrawLine(transform.position, transform.position + collisionInfo.forward * 0.5f * 2, Color.blue);
+        Debug.DrawLine(transform.position, transform.position - Vector3.up * 0.5f, Color.green);
+        Debug.DrawLine(transform.position, transform.position - Vector3.up * 0.5f * 2f, Color.red);
     }
 
     

@@ -9,7 +9,7 @@ public class Surface : MonoBehaviour {
 
     [Range(0, 1)] public float friction = 1;
 
-    private void Start() {
+    public void Start() {
         boxCollider = GetComponent<BoxCollider>();
         if(passthrough) trueCollider = transform.GetChild(0);
     }
