@@ -3,20 +3,22 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Surface : MonoBehaviour {
+    public SurfaceType surfaceAttributes;
+    [HideInInspector] public BoxCollider boxCollider;
     public bool passthrough;
-    private BoxCollider boxCollider;
-    private Transform trueCollider;
-
-    [Range(0, 1)] public float friction = 1;
+    private const int SURFACE_LAYER = 10;
+    private const int PASSTHROUGH_LAYER = 11;
 
     public void Start() {
         boxCollider = GetComponent<BoxCollider>();
-        if(passthrough) trueCollider = transform.GetChild(0);
+        if (passthrough) {
+            new GameObject("Passthrough").AddComponent<SurfaceTrigger>().Create(this, SurfaceTriggerType.Passthrough);
+            TogglePassthrough(false);
+        }
+
     }
 
-    public void PlayerAbove(bool state) {
-        if(passthrough) {
-            trueCollider.gameObject.SetActive(state);
-        }
+    public void TogglePassthrough(bool state) {
+        gameObject.layer = state ? PASSTHROUGH_LAYER : SURFACE_LAYER;
     }
 }

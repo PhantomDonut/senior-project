@@ -25,6 +25,10 @@ public class Player : MonoBehaviour {
     private PlayerController playerController;
     new Rigidbody rigidbody;
 
+    [Header("Surface")]
+    public bool onPlatform;
+    private Transform platformTransform;
+
     [Header("Visuals")]
     public Transform visual;
     private Animator animator;
@@ -73,10 +77,13 @@ public class Player : MonoBehaviour {
         }
 
         if (!collisionInfo.groundedLastFrame && collisionInfo.grounded) {
-            //Update jumps on landing frame
             jumpsRemaining = collisionInfo.grounded ? (collisionInfo.sliding || collisionInfo.slidingLastFrame) ? 1 : maxJumps : jumpsRemaining;
         }
         jumpCounterText.text = string.Format("Jumps: {0}", jumpsRemaining);
+
+        if(onPlatform && !justJumped) {
+            transform.localPosition = new Vector3(transform.localPosition.x, ((platformTransform.GetComponent<BoxCollider>().size.y * platformTransform.localScale.y) * 0.5f + 0.5f) / platformTransform.localScale.y, transform.localPosition.z);
+        }
 
         collisionInfo = playerController.CalculateFrameVelocity(input, speed, validJump, inputManager.JumpKeyUp, justJumped);
         
@@ -87,7 +94,7 @@ public class Player : MonoBehaviour {
         }
 
         AnimatePlayer(horizontalInputExists, savedRotation);
-        
+
         rigidbody.velocity = collisionInfo.velocity;
         if (debug) DrawDebugLines();
     }
@@ -120,19 +127,31 @@ public class Player : MonoBehaviour {
         justJumped = false;
     }
 
+    public void PlatformAttatchmentToggle(bool state, Transform platformOrNull) {
+        transform.SetParent(platformOrNull);
+        onPlatform = state;
+        platformTransform = platformOrNull;
+        if (state) {
+            rigidbody.interpolation = RigidbodyInterpolation.None;
+        } else {
+            rigidbody.interpolation = RigidbodyInterpolation.Interpolate;
+        }
+    }
     
-
     void DrawDebugLines() {
         Debug.DrawLine(transform.position, transform.position + collisionInfo.forward * 0.5f * 2, Color.blue);
         Debug.DrawLine(transform.position, transform.position - Vector3.up * 0.5f, Color.green);
         Debug.DrawLine(transform.position, transform.position - Vector3.up * 0.5f * 2f, Color.red);
     }
 
-    
-
     public IEnumerator JustTeleported() {
         justTeleported = true;
         yield return new WaitForSeconds(Teleporter.TELEPORT_COOLDOWN);
         justTeleported = false;
+    }
+
+    public void CancelMomentum() {
+        collisionInfo.velocity = Vector3.zero;
+        collisionInfo.velocityPriorFrame = Vector3.zero;
     }
 }

@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SurfaceType : MonoBehaviour {
-    public float[] frictionValues = {1, 0.12f, 0.04f};    
+public enum BounceValue { None = 0, Low = 3, Medium = 5, High = 7, Maximum = 10 };
+[CreateAssetMenu(menuName = "Custom/Surface Type", fileName = "Default Surface Type")]
+public class SurfaceType : ScriptableObject {
+    [Range(0, 1)] public float friction = 1;
+    public BounceValue bounceMultiplier = 0;
 }

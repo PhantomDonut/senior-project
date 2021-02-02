@@ -15,6 +15,8 @@ public class GameManager : Singleton<GameManager> {
     public static float PlayTime;
     [HideInInspector] public bool countPlayTime = true;
 
+    public Player player;
+
     private void Update() {
         if(gameState == GameState.Regular) {
             GameTime += Time.deltaTime;

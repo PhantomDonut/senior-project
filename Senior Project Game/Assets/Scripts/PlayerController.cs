@@ -15,6 +15,8 @@ public class PlayerController : MonoBehaviour {
 
     Vector3 movementVelocity;
     Vector3 verticalVelocity;
+    private const int TERMINAL_VELOCITY = 100;
+    private Vector3 terminalVertical;
 
     Vector3 movementTotal;
 
@@ -30,7 +32,11 @@ public class PlayerController : MonoBehaviour {
     [Header("Surface")]
     public LayerMask translucentLayers;
     [SerializeField] [Range(0, 1)] private float friction = 1;
+    private float globalFrictionMultiplier = 1;
     private Surface lastFrameSurface;
+    [SerializeField] private float bounceMultiplier = 0;
+    private bool justBounced = false;
+    private const int BOUNCE_MINIMUM = 6;
 
     [Header("Debug")]
     public TextMeshProUGUI debugText;
@@ -40,6 +46,7 @@ public class PlayerController : MonoBehaviour {
         rigidbody = GetComponent<Rigidbody>();
         bounds = GetComponent<CapsuleCollider>().bounds;
         height = 0.5f;
+        terminalVertical = new Vector3(0, -TERMINAL_VELOCITY, 0);
     }
     public CollisionInfo CalculateFrameVelocity(Vector2 input, float speed, bool validJump, bool jumpKeyUp, bool justJumped) {
         collisionInfo.velocityPriorFrame = collisionInfo.velocity;
@@ -88,6 +95,8 @@ public class PlayerController : MonoBehaviour {
         movementTotal = movementVelocity + slideVelocity;
 
         Vector3 frameVelocity = movementTotal + verticalVelocity;
+        if (collisionInfo.slidingLastFrame && !collisionInfo.sliding && collisionInfo.grounded) StartCoroutine(SlideExitFriction());
+        friction /= globalFrictionMultiplier;
         frameVelocity = new Vector3(Mathf.Lerp(collisionInfo.velocityPriorFrame.x, frameVelocity.x, friction), frameVelocity.y, Mathf.Lerp(collisionInfo.velocityPriorFrame.z, frameVelocity.z, friction));
         collisionInfo.velocity = frameVelocity;
         return collisionInfo;
@@ -103,6 +112,7 @@ public class PlayerController : MonoBehaviour {
     void CheckGround(bool justJumped) {
         collisionInfo.groundedLastFrame = collisionInfo.grounded;
         friction = 1;
+        bounceMultiplier = 0;
 
         Surface hitSurface = null;
         if (Physics.BoxCast(transform.position, new Vector3(bounds.extents.x, 0.0125f, bounds.extents.z), -Vector3.up, out hitInfo, transform.rotation, height + heightPadding, ground) && !justJumped) {
@@ -112,11 +122,8 @@ public class PlayerController : MonoBehaviour {
             }
             hitSurface = hitInfo.transform.gameObject.GetComponent<Surface>();
             if (hitSurface != null) {
-                friction = hitSurface.friction;
-                if(hitSurface.GetType() == typeof(MotionPlatform)) {
-                    transform.SetParent(hitSurface.transform);
-                    rigidbody.interpolation = RigidbodyInterpolation.None;
-                }
+                friction = hitSurface.surfaceAttributes.friction;
+                bounceMultiplier = (int)hitSurface.surfaceAttributes.bounceMultiplier * 0.1f;
             }
             collisionInfo.grounded = true;
         }
@@ -124,29 +131,9 @@ public class PlayerController : MonoBehaviour {
             collisionInfo.grounded = false;
         }
 
-        //Detect passthrough platform
-        RaycastHit passthroughBoxcast;
-        if (Physics.BoxCast(transform.position, new Vector3(bounds.extents.x, 0.0125f, bounds.extents.z), -Vector3.up, out passthroughBoxcast, transform.rotation, height + heightPadding, translucentLayers)) {
-            if(passthroughBoxcast.transform != null) {
-                hitSurface = passthroughBoxcast.transform.GetComponent<Surface>();
-                hitSurface.PlayerAbove(true);
-
-                friction = hitSurface.friction;
-                if (hitSurface.GetType() == typeof(MotionPlatform)) {
-                    transform.SetParent(hitSurface.transform);
-                    rigidbody.interpolation = RigidbodyInterpolation.None;
-                }
-            }
-        }
-
         //Debug.Log(hitSurface != null ? hitSurface.name : "Null");
-
         if (hitSurface != lastFrameSurface && lastFrameSurface != null) {
-            lastFrameSurface.PlayerAbove(false);
-            if (lastFrameSurface.GetType() == typeof(MotionPlatform)) {
-                transform.SetParent(null);
-                rigidbody.interpolation = RigidbodyInterpolation.Interpolate;
-            }
+            //lastFrameSurface.PlayerAbove(false);
         }
         lastFrameSurface = hitSurface;
     }
@@ -162,8 +149,19 @@ public class PlayerController : MonoBehaviour {
     void ApplyGravity() {
         if (!collisionInfo.grounded) {
             verticalVelocity += gravity * Time.deltaTime;
-        } else {
+            if (verticalVelocity.y < -TERMINAL_VELOCITY) {
+                verticalVelocity = terminalVertical;
+                Debug.Log("hello");
+            }
+        } else if (!justBounced) {
             verticalVelocity = Vector3.zero;
+        }
+
+        if(!collisionInfo.groundedLastFrame && collisionInfo.grounded && bounceMultiplier > 0 && Mathf.Abs(collisionInfo.velocityPriorFrame.y) > BOUNCE_MINIMUM) {
+            Debug.Log("Downward was: " + collisionInfo.velocityPriorFrame.y + " upwards is " + Mathf.Abs(collisionInfo.velocityPriorFrame.y * bounceMultiplier));
+            verticalVelocity += new Vector3(0, Mathf.Abs(collisionInfo.velocityPriorFrame.y * bounceMultiplier), 0);
+            StartCoroutine(BounceDelay());
+
         }
 
         collisionInfo.sliding = collisionInfo.groundAngle > maxGroundAngle;
@@ -173,6 +171,18 @@ public class PlayerController : MonoBehaviour {
         } else {
             slideVelocity = Vector3.zero;
         }
+    }
+
+    IEnumerator SlideExitFriction() {
+        globalFrictionMultiplier = 20;
+        yield return new WaitForSeconds(0.33f);
+        globalFrictionMultiplier = 1;
+    }
+
+    IEnumerator BounceDelay() {
+        justBounced = true;
+        yield return new WaitForSeconds(0.1f);
+        justBounced = false;
     }
 
     private void Move(float speed) {
