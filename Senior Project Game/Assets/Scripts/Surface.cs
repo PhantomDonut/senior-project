@@ -6,10 +6,12 @@ public class Surface : MonoBehaviour {
     public SurfaceType surfaceAttributes;
     [HideInInspector] public BoxCollider boxCollider;
     public bool passthrough;
+    public bool walljump = true;
     private const int SURFACE_LAYER = 10;
     private const int PASSTHROUGH_LAYER = 11;
 
     public void Start() {
+        if(surfaceAttributes == null) { surfaceAttributes = GameManager.Instance.GetDefaultSurface(); }
         boxCollider = GetComponent<BoxCollider>();
         if (passthrough) {
             new GameObject("Passthrough").AddComponent<SurfaceTrigger>().Create(this, SurfaceTriggerType.Passthrough);

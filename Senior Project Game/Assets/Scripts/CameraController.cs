@@ -4,7 +4,8 @@ using UnityEngine;
 
 public class CameraController : MonoBehaviour {
 
-    public Transform target;
+    public Transform positionTarget;
+    public Transform rotationTarget;
     public Vector3 offsetPosition;
     public float moveSpeed = 5;
     public float turnSpeed = 10;
@@ -30,13 +31,13 @@ public class CameraController : MonoBehaviour {
     }
 
     private void MoveWithTarget() {
-        targetPosition = target.position + offsetPosition;
+        targetPosition = positionTarget.position + offsetPosition;
         transform.position = Vector3.Lerp(transform.position, targetPosition, moveSpeed * Time.deltaTime);
     }
 
     private void LookAtTarget() {
-        targetRotation = Quaternion.LookRotation(target.position - transform.position);
-        transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, turnSpeed * Time.deltaTime);
+        //targetRotation = Quaternion.LookRotation(rotationTarget.position - transform.position);
+        //transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, turnSpeed * Time.deltaTime);
     }
 
     private IEnumerator RotateAroundTarget(float angle) {
@@ -50,6 +51,10 @@ public class CameraController : MonoBehaviour {
             offsetPosition = Vector3.SmoothDamp(offsetPosition, targetOffsetPosition, ref velocity, smoothSpeed);
 
             distance = Vector3.Distance(offsetPosition, targetOffsetPosition);
+
+            targetRotation = Quaternion.LookRotation(rotationTarget.position - transform.position);
+            Vector3 tempRotation = Quaternion.Slerp(transform.rotation, targetRotation, turnSpeed * Time.deltaTime).eulerAngles;
+            transform.rotation = Quaternion.Euler(transform.eulerAngles.x, tempRotation.y, transform.rotation.z);
             yield return null;
         }
 

@@ -18,12 +18,11 @@ public class Teleporter : MonoBehaviour {
     private void Start() {
         teleportationPoint = transform.position + teleportationOffset;
         player = GameManager.Instance.player;
-        Debug.Log(player);
     }
 
     private void OnTriggerEnter(Collider other) {
-        if(other.CompareTag("Player") || other.CompareTag("Player Contact")) {
-            if (!player.justTeleported) Teleport(other.transform);
+        if(other.transform.root.CompareTag("Player")) {
+            if (!player.justTeleported) Teleport(other.transform.root);
         }
     }
 

@@ -8,12 +8,12 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: Skybox
-  m_Shader: {fileID: 106, guid: 0000000000000000f000000000000000, type: 0}
+  m_Shader: {fileID: -6465566751694194690, guid: 49cd38fc5de15304d80df1fa900bb6f6, type: 3}
   m_ShaderKeywords: _MAPPING_LATITUDE_LONGITUDE_LAYOUT _SUNDISK_HIGH_QUALITY
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
-  m_CustomRenderQueue: -1
+  m_CustomRenderQueue: 3000
   stringTagMap: {}
   disabledShaderPasses: []
   m_SavedProperties:
@@ -67,15 +67,25 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _Texture2DAsset_D5AAB987_Out_0:
+        m_Texture: {fileID: 2800000, guid: b59d7323d2c4c6a4a86b44749a16dace, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _UpTex:
         m_Texture: {fileID: 2800000, guid: 07f19a32bfccb0d4099c34c801dd2373, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Floats:
+    - Vector1_5006A6DB: 0
+    - Vector1_6E1A052F: 21.4
+    - Vector1_9A47BD85: 0.334
+    - Vector1_D530AAF: 50
+    - Vector1_D956D67B: 0
     - _AlphaClip: 0
     - _AtmosphereThickness: 1
     - _Blend: 0
     - _BumpScale: 1
+    - _CloudHeight: 0.096
     - _Cull: 2
     - _Cutoff: 0.5
     - _DstBlend: 0
@@ -101,6 +111,7 @@ Material:
     - _SunSize: 0.04
     - _SunSizeConvergence: 5
     - _Surface: 0
+    - _WindSpeed: 0.25
     - _WorkflowMode: 1
     - _ZWrite: 1
     m_Colors:
@@ -108,8 +119,11 @@ Material:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _GroundColor: {r: 0.369, g: 0.349, b: 0.341, a: 1}
+    - _HorizonColor: {r: 0.17647058, g: 0.98029387, b: 1, a: 0}
+    - _SkyColor: {r: 0.43293878, g: 0.55587363, b: 0.6509434, a: 0}
     - _SkyTint: {r: 0.5, g: 0.5, b: 0.5, a: 1}
     - _SpecColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
+    - _SunDirection: {r: 0.69, g: -0.23, b: 0, a: 0}
     - _Tint: {r: 1, g: 1, b: 1, a: 0.5}
   m_BuildTextureStacks: []
 --- !u!114 &8403322950440446777

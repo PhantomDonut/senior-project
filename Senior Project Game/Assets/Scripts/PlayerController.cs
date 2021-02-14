@@ -20,6 +20,10 @@ public class PlayerController : MonoBehaviour {
 
     Vector3 movementTotal;
 
+    [HideInInspector] public Vector3 wallslideSpeed;
+    [HideInInspector] public float walljumpPower;
+    [HideInInspector] public float walljumpHeightMultiplier;
+
     [Header("Slopes")]
     [Range(0, 90)] public float maxGroundAngle = 50;
     float currentSlideAcceleration;
@@ -48,7 +52,7 @@ public class PlayerController : MonoBehaviour {
         height = 0.5f;
         terminalVertical = new Vector3(0, -TERMINAL_VELOCITY, 0);
     }
-    public CollisionInfo CalculateFrameVelocity(Vector2 input, float speed, bool validJump, bool jumpKeyUp, bool justJumped) {
+    public CollisionInfo CalculateFrameVelocity(Vector2 input, float speed, bool validJump, bool jumpKeyUp, bool justJumped, bool onWall, Vector3 wallNormal, float movementModifier) {
         collisionInfo.velocityPriorFrame = collisionInfo.velocity;
         collisionInfo.slidingLastFrame = collisionInfo.sliding;
 
@@ -74,6 +78,10 @@ public class PlayerController : MonoBehaviour {
             if (collisionInfo.sliding) {
                 verticalVelocity.x += slideVelocity.normalized.x * currentSlideAcceleration * 0.9f;
                 verticalVelocity.z += slideVelocity.normalized.z * currentSlideAcceleration * 0.9f;
+            } else if (onWall) {
+                verticalVelocity.x = wallNormal.x * walljumpPower;
+                verticalVelocity.z = wallNormal.z * walljumpPower;
+                verticalVelocity.y *= walljumpHeightMultiplier;
             } else {
                 verticalVelocity += movementVelocity * 0.5f;
             }
@@ -85,7 +93,7 @@ public class PlayerController : MonoBehaviour {
             }
         }
 
-        ApplyGravity();
+        ApplyGravity(onWall);
 
         movementVelocity = Vector3.zero;
         if(Mathf.Abs(input.x) + Mathf.Abs(input.y) > 0) {
@@ -93,7 +101,7 @@ public class PlayerController : MonoBehaviour {
         }
 
         movementTotal = movementVelocity + slideVelocity;
-
+        movementTotal *= movementModifier;
         Vector3 frameVelocity = movementTotal + verticalVelocity;
         if (collisionInfo.slidingLastFrame && !collisionInfo.sliding && collisionInfo.grounded) StartCoroutine(SlideExitFriction());
         friction /= globalFrictionMultiplier;
@@ -146,16 +154,18 @@ public class PlayerController : MonoBehaviour {
         collisionInfo.groundAngle = Vector3.Angle(Vector3.up, hitInfo.normal);
     }
 
-    void ApplyGravity() {
-        if (!collisionInfo.grounded) {
+    void ApplyGravity(bool onWall) {
+        if (!collisionInfo.grounded && !onWall) {
             verticalVelocity += gravity * Time.deltaTime;
             if (verticalVelocity.y < -TERMINAL_VELOCITY) {
                 verticalVelocity = terminalVertical;
-                Debug.Log("hello");
             }
+        } else if (onWall) {
+            verticalVelocity += wallslideSpeed * Time.deltaTime;
         } else if (!justBounced) {
             verticalVelocity = Vector3.zero;
         }
+        
 
         if(!collisionInfo.groundedLastFrame && collisionInfo.grounded && bounceMultiplier > 0 && Mathf.Abs(collisionInfo.velocityPriorFrame.y) > BOUNCE_MINIMUM) {
             Debug.Log("Downward was: " + collisionInfo.velocityPriorFrame.y + " upwards is " + Mathf.Abs(collisionInfo.velocityPriorFrame.y * bounceMultiplier));
@@ -194,6 +204,14 @@ public class PlayerController : MonoBehaviour {
 
     private void LateUpdate() {
         debugText.text = string.Format(debugTextFormat, collisionInfo.grounded, collisionInfo.sliding, slideVelocity, movementTotal, verticalVelocity, System.Math.Round(currentSlideAcceleration, 2));
+    }
+
+    public void CancelMomentum() {
+        movementVelocity = Vector3.zero;
+        verticalVelocity = Vector3.zero;
+        slideVelocity = Vector3.zero;
+        collisionInfo.velocity = Vector3.zero;
+        collisionInfo.velocityPriorFrame = Vector3.zero;
     }
 }
 
