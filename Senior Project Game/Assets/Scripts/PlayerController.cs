@@ -15,7 +15,7 @@ public class PlayerController : MonoBehaviour {
 
     Vector3 movementVelocity;
     Vector3 verticalVelocity;
-    private const int TERMINAL_VELOCITY = 100;
+    private const int TERMINAL_VELOCITY = 50;
     private Vector3 terminalVertical;
 
     Vector3 movementTotal;

@@ -42,15 +42,16 @@ public class Player : MonoBehaviour {
     [SerializeField] private float wallSlideSpeed = 5;
     private bool onWall;
     private Vector3 wallNormal;
-    const float WALLJUMP_INPUT_DELAY = 99;
-    private float wallTime;
+    const float WALLJUMP_INPUT_DELAY = 1;
     private GameObject lastWallUsed;
     const float CONTROL_POST_WALLJUMP = 0.5f;
+    private bool controlTesting;
+    const float MAX_WALL_VELOCITY = 30;
+    private Coroutine walljumpTimerCoroutine;
 
     [Header("Surface")]
     public bool onPlatform;
     private Transform platformTransform;
-    private float holdingWallStartTime;
 
     [Header("Visuals")]
     public Transform visual;
@@ -60,7 +61,7 @@ public class Player : MonoBehaviour {
     public float visualTurnSpeed = 10;
     Quaternion targetRotation;
     public float visualMoveSpeed = 15;
-    [SerializeField] private Cloth cloth;
+    private Vector2 velocity2D;
 
     [Header("Interaction")]
     public bool justTeleported;
@@ -92,9 +93,9 @@ public class Player : MonoBehaviour {
         input = new Vector2(inputManager.HorizontalMotion, inputManager.VerticallMotion);
 
         if (onWall) {
-            wallTime = GameManager.GameTime - holdingWallStartTime;
-            if (wallTime < WALLJUMP_INPUT_DELAY) {
+            if (inputManager.LateralInputExists) {
                 input = Vector2.zero;
+                if (!controlTesting) walljumpTimerCoroutine = StartCoroutine(WalljumpInputTimer());
             }
             if (collisionInfo.grounded) {
                 StartCoroutine(ExitWalljump(false));
@@ -118,11 +119,6 @@ public class Player : MonoBehaviour {
             jumpQueued = false;
         }
 
-        if(Input.GetKeyDown(KeyCode.R)) {
-            cloth.enabled = false;
-            cloth.enabled = true;
-        }
-
         jumpCounterText.text = string.Format("Jumps: {0} Queued: {1}", jumpsRemaining, jumpQueued);
 
         AnimatePlayer(inputManager.LateralInputExists, savedRotation);
@@ -135,25 +131,29 @@ public class Player : MonoBehaviour {
 
         bool validJump = false;
         if (jumpQueued && (collisionInfo.grounded || jumpsRemaining > 0 || onWall) && !justJumped) {
-            jumpsRemaining--;
             jumpQueued = false;
             StartCoroutine(JumpReset());
             validJump = true;
+            jumpsRemaining--;
         }
 
+        //Leaving Ground Frame
         if (collisionInfo.groundedLastFrame && !collisionInfo.grounded) jumpsRemaining = extraJumps;
+
+        //Landing Frame
         if (!collisionInfo.groundedLastFrame && collisionInfo.grounded) StartCoroutine(Landing());
 
         collisionInfo = playerController.CalculateFrameVelocity(input, speed, validJump, inputManager.JumpKeyUp, justJumped, onWall, wallNormal, globalMovementModifier);
-
         rigidbody.velocity = collisionInfo.velocity;
+        velocity2D.x = rigidbody.velocity.x;
+        velocity2D.y = rigidbody.velocity.z;
 
-        if (onPlatform && !justJumped) {
+        if (onPlatform && !justJumped && onWall) {
             transform.localPosition = new Vector3(transform.localPosition.x, ((platformTransform.GetComponent<BoxCollider>().size.y * platformTransform.localScale.y) * 0.5f + 0.5f) / platformTransform.localScale.y, transform.localPosition.z);
         }
 
         if(onWall && validJump) {
-            globalMovementModifier = 0.2f;
+            jumpsRemaining++;
             StartCoroutine(ExitWalljump(true));
         }
 
@@ -175,14 +175,20 @@ public class Player : MonoBehaviour {
 
     private void AnimatePlayer(bool horizontalInputExists, Quaternion savedRotation) {
         animator.SetBool("Grounded", collisionInfo.grounded);
-        animator.SetBool("Walking", horizontalInputExists & !running);
-        animator.SetBool("Running", horizontalInputExists & running & !sprinting);
-        animator.SetBool("Sprinting", horizontalInputExists & sprinting);
+        //animator.SetBool("Walking", horizontalInputExists & !running);
+        //animator.SetBool("Running", horizontalInputExists & running & !sprinting);
+        //animator.SetBool("Sprinting", horizontalInputExists & sprinting);
+        animator.SetFloat("Horizontal Velocity", Mathf.InverseLerp(0, sprintSpeed, velocity2D.magnitude));
+        animator.SetFloat("Smooth Horizontal Velocity", Mathf.InverseLerp(0, sprintSpeed, velocity2D.magnitude), 0.2f, Time.deltaTime);
         animator.SetBool("Sliding", collisionInfo.sliding);
+        animator.SetFloat("Vertical Velocity", Mathf.InverseLerp(-10, 10, collisionInfo.velocity.y));
+        animator.SetBool("Holding Wall", onWall);
         
         float velocityAngle = Mathf.Atan2(collisionInfo.velocity.x, collisionInfo.velocity.z) * Mathf.Rad2Deg;
-        targetRotation = Quaternion.Euler(0, !onWall ? horizontalInputExists ? angle : velocityAngle : 180 + Mathf.Atan2(wallNormal.x, wallNormal.z) * Mathf.Rad2Deg, 0); 
-        float lerpTime = onWall ? 0.75f : Mathf.Clamp(Mathf.InverseLerp(0, 2, Mathf.Abs(collisionInfo.velocity.x)) + Mathf.InverseLerp(0, 2, Mathf.Abs(collisionInfo.velocity.z)), 0, 1);
+
+        targetRotation = Quaternion.Euler(0, (!onWall ? (horizontalInputExists ? angle : (velocity2D.magnitude > 0.5f ? collisionInfo.grounded ? velocityAngle : transform.eulerAngles.y : transform.eulerAngles.y)) : 180 + Mathf.Atan2(wallNormal.x, wallNormal.z) * Mathf.Rad2Deg), 0); 
+        
+        float lerpTime = onWall ? 0.75f : velocity2D.magnitude > 0.1f ? Mathf.Clamp01(Mathf.InverseLerp(0, 2, Mathf.Abs(collisionInfo.velocity.x)) + Mathf.InverseLerp(0, 2, Mathf.Abs(collisionInfo.velocity.z))) : 1;
         visual.rotation = Quaternion.Slerp(savedRotation, targetRotation, Time.deltaTime * visualTurnSpeed * lerpTime);
     }
 
@@ -194,7 +200,6 @@ public class Player : MonoBehaviour {
     IEnumerator Landing() {
         jumpsRemaining = collisionInfo.grounded ? (collisionInfo.sliding || collisionInfo.slidingLastFrame) ? baseJumps : baseJumps + extraJumps : jumpsRemaining;
         lastWallUsed = null;
-        //Debug.Log("Landing: " + priorJumpVelocity + " " + Mathf.InverseLerp(10, 20, priorJumpVelocity));
         float startingTime = GameManager.GameTime;
         float priorJumpVelocity = Mathf.Abs(collisionInfo.velocityPriorFrame.y);
         while (collisionInfo.grounded && GameManager.GameTime - startingTime < LANDING_ANIM_TIME) {
@@ -209,12 +214,6 @@ public class Player : MonoBehaviour {
         onPlatform = state;
         platformTransform = platformOrNull;
     }
-    
-    void DrawDebugLines() {
-        Debug.DrawLine(transform.position, transform.position + collisionInfo.forward * 0.5f * 2, Color.blue);
-        Debug.DrawLine(transform.position, transform.position - Vector3.up * 0.5f, Color.green);
-        Debug.DrawLine(transform.position, transform.position - Vector3.up * 0.5f * 2f, Color.red);
-    }
 
     public IEnumerator JustTeleported() {
         justTeleported = true;
@@ -227,23 +226,35 @@ public class Player : MonoBehaviour {
     }
 
     private void EnterWalljump(GameObject wall, Vector3 normal) {
-        if (wall == lastWallUsed) {
-            Debug.Log("ayy");
-            //return;
-        }
-        Debug.Log(normal);
         CancelMomentum();
         onWall = true;
-        holdingWallStartTime = GameManager.GameTime;
         wallNormal = normal;
+        transform.SetParent(wall.transform);
         lastWallUsed = wall;
+        if(walljumpTimerCoroutine != null) StopCoroutine(walljumpTimerCoroutine);
+        globalMovementModifier = 1;
+    }
+
+    private IEnumerator WalljumpInputTimer() {
+        controlTesting = true;
+        float startTime = GameManager.GameTime;
+        bool stillDesiringMotion = true;
+        while (GameManager.GameTime - startTime < WALLJUMP_INPUT_DELAY) {
+            stillDesiringMotion = inputManager.LateralInputExists;
+            if (!stillDesiringMotion) break;
+            yield return new WaitForEndOfFrame();
+        }
+        controlTesting = false;
+        if(stillDesiringMotion) StartCoroutine(ExitWalljump(false));
     }
 
     private IEnumerator ExitWalljump(bool jumpOut) {
         onWall = false;
-        holdingWallStartTime = 0;
         wallNormal = Vector3.zero;
-        if(jumpOut) {
+        transform.SetParent(null);
+        if (jumpOut) {
+            globalMovementModifier = 0.2f;
+            transform.Rotate(0, 180, 0);
             float startTime = GameManager.GameTime;
             while(GameManager.GameTime - startTime < CONTROL_POST_WALLJUMP) {
                 globalMovementModifier = Mathf.Lerp(0.2f, 0.8f, Mathf.InverseLerp(0, CONTROL_POST_WALLJUMP, GameManager.GameTime - startTime));
@@ -251,18 +262,25 @@ public class Player : MonoBehaviour {
             }
             globalMovementModifier = 1;
         }
+
     }
 
     private void OnCollisionEnter(Collision collision) {
-        //Debug.Log(collision.transform.name);
         if (!collisionInfo.grounded && collision.transform.GetComponent<Surface>() && collision.transform.GetComponent<Surface>().walljump && collision.GetContact(0).normal.y < 0.05f && collision.GetContact(0).normal.y > -0.05f) {
-            EnterWalljump(collision.gameObject, collision.GetContact(0).normal);
+            if(Mathf.Abs(collisionInfo.velocity.y) < MAX_WALL_VELOCITY) EnterWalljump(collision.gameObject, collision.GetContact(0).normal);
         }
     }
 
-    private void OnCollisionExit(Collision collision) {
-        if (onWall && !collisionInfo.grounded && collision.transform.GetComponent<Surface>() && collision.transform.GetComponent<Surface>().walljump) {
-            //StartCoroutine(ExitWallJumpDelay());
+    private void OnCollisionStay(Collision collision) {
+        if(onWall && collision.transform.GetComponent<Surface>() && collision.transform.GetComponent<Surface>().walljump && collision.GetContact(0).normal.y < 0.05f && collision.GetContact(0).normal.y > -0.05f) {
+            wallNormal = collision.GetContact(0).normal;
+        } else if (onWall) {
+            StartCoroutine(ExitWalljump(false));
         }
+    }
+    void DrawDebugLines() {
+        Debug.DrawLine(transform.position, transform.position + collisionInfo.forward * 0.5f * 2, Color.blue);
+        Debug.DrawLine(transform.position, transform.position - Vector3.up * 0.5f, Color.green);
+        Debug.DrawLine(transform.position, transform.position - Vector3.up * 0.5f * 2f, Color.red);
     }
 }

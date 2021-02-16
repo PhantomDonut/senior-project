@@ -16,11 +16,12 @@ public class MotionPlatform : Surface {
     [ShowIf("enableMotion", true)] public bool lockedUntilPlayer;
     private bool motionLockedState = true;
     private float startTime;
+    [SerializeField] private bool generateTriggers = true;
     [HideInInspector] public bool directionUp;
 
     new void Start() {
         base.Start();
-        new GameObject("Motion").AddComponent<SurfaceTrigger>().Create(this, SurfaceTriggerType.Motion);
+        if(generateTriggers) new GameObject("Motion").AddComponent<SurfaceTrigger>().Create(this, SurfaceTriggerType.Motion);
         Rigidbody rb = gameObject.AddComponent<Rigidbody>();
         rb.isKinematic = true;
         rb.useGravity = false;

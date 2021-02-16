@@ -7,7 +7,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Skybox
+  m_Name: Dark Skybox
   m_Shader: {fileID: -6465566751694194690, guid: 49cd38fc5de15304d80df1fa900bb6f6, type: 3}
   m_ShaderKeywords: _MAPPING_LATITUDE_LONGITUDE_LAYOUT _SUNDISK_HIGH_QUALITY
   m_LightmapFlags: 4
@@ -77,15 +77,15 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Floats:
     - Vector1_5006A6DB: 0
-    - Vector1_6E1A052F: 21.4
-    - Vector1_9A47BD85: 0.5
+    - Vector1_6E1A052F: 50
+    - Vector1_9A47BD85: 0
     - Vector1_D530AAF: 50
     - Vector1_D956D67B: 0
     - _AlphaClip: 0
     - _AtmosphereThickness: 1
     - _Blend: 0
     - _BumpScale: 1
-    - _CloudHeight: 0.05
+    - _CloudHeight: -2
     - _Cull: 2
     - _Cutoff: 0.5
     - _DstBlend: 0
@@ -119,8 +119,8 @@ Material:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _GroundColor: {r: 0.369, g: 0.349, b: 0.341, a: 1}
-    - _HorizonColor: {r: 0.17647058, g: 0.98029387, b: 1, a: 0}
-    - _SkyColor: {r: 0.43293878, g: 0.55587363, b: 0.6509434, a: 0}
+    - _HorizonColor: {r: 0, g: 0, b: 0, a: 0}
+    - _SkyColor: {r: 0, g: 0, b: 0, a: 0}
     - _SkyTint: {r: 0.5, g: 0.5, b: 0.5, a: 1}
     - _SpecColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
     - _SunDirection: {r: 0.69, g: -0.23, b: 0, a: 0}
