@@ -784,6 +784,7 @@ MonoBehaviour:
   surfaceAttributes: {fileID: 11400000, guid: 151825ce3eaec58449e201d2639e67ea, type: 2}
   boxCollider: {fileID: 0}
   passthrough: 1
+  walljump: 1
 --- !u!65 &263640361
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1649,6 +1650,9 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 1537
   heightPadding: 0.1
+  wallslideSpeed: {x: 0, y: 0, z: 0}
+  walljumpPower: 0
+  walljumpHeightMultiplier: 0
   maxGroundAngle: 31
   gravity: {x: 0, y: 0, z: 0}
   maxJumpVelocity: 0
@@ -1728,11 +1732,13 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  walljumpPower: 8
+  walljumpHeightMultiplier: 1
+  wallSlideSpeed: 5
   onPlatform: 0
   visual: {fileID: 1534356566}
   visualTurnSpeed: 15
   visualMoveSpeed: 15
-  cloth: {fileID: 1312952517}
   justTeleported: 0
   debug: 1
   jumpCounterText: {fileID: 1399067579}
@@ -1782,12 +1788,14 @@ MonoBehaviour:
   surfaceAttributes: {fileID: 11400000, guid: 151825ce3eaec58449e201d2639e67ea, type: 2}
   boxCollider: {fileID: 0}
   passthrough: 0
+  walljump: 1
   enableMotion: 1
   movementOffset: {x: 5, y: 0, z: 0}
   movementSpeed: 2
   enableRotation: 0
   rotationSpeed: 0.5
   lockedUntilPlayer: 1
+  generateTriggers: 1
   directionUp: 0
 --- !u!65 &739529310
 BoxCollider:
@@ -2669,6 +2677,7 @@ MonoBehaviour:
   gameState: 0
   countPlayTime: 1
   player: {fileID: 707752239}
+  defaultSurface: {fileID: 0}
 --- !u!4 &1163034249
 Transform:
   m_ObjectHideFlags: 0
@@ -2732,12 +2741,14 @@ MonoBehaviour:
   surfaceAttributes: {fileID: 11400000, guid: 151825ce3eaec58449e201d2639e67ea, type: 2}
   boxCollider: {fileID: 0}
   passthrough: 1
+  walljump: 1
   enableMotion: 1
   movementOffset: {x: 0, y: 20, z: 0}
   movementSpeed: 6
   enableRotation: 0
   rotationSpeed: 0
   lockedUntilPlayer: 0
+  generateTriggers: 1
   directionUp: 0
 --- !u!65 &1188954170
 BoxCollider:
@@ -3009,6 +3020,7 @@ MonoBehaviour:
   surfaceAttributes: {fileID: 11400000, guid: 151825ce3eaec58449e201d2639e67ea, type: 2}
   boxCollider: {fileID: 0}
   passthrough: 0
+  walljump: 1
 --- !u!1 &1268588592
 GameObject:
   m_ObjectHideFlags: 0
@@ -3952,12 +3964,14 @@ MonoBehaviour:
   surfaceAttributes: {fileID: 11400000, guid: 151825ce3eaec58449e201d2639e67ea, type: 2}
   boxCollider: {fileID: 0}
   passthrough: 0
+  walljump: 1
   enableMotion: 1
   movementOffset: {x: 12, y: 4, z: 0}
   movementSpeed: 4
   enableRotation: 0
   rotationSpeed: 0
   lockedUntilPlayer: 0
+  generateTriggers: 1
   directionUp: 0
 --- !u!65 &1486187717
 BoxCollider:
@@ -4153,12 +4167,14 @@ MonoBehaviour:
   surfaceAttributes: {fileID: 11400000, guid: 151825ce3eaec58449e201d2639e67ea, type: 2}
   boxCollider: {fileID: 0}
   passthrough: 0
+  walljump: 1
   enableMotion: 0
   movementOffset: {x: 1, y: 0, z: 0}
   movementSpeed: 0.5
   enableRotation: 1
   rotationSpeed: 4
   lockedUntilPlayer: 0
+  generateTriggers: 1
   directionUp: 0
 --- !u!65 &1558451563
 BoxCollider:
@@ -4615,12 +4631,14 @@ MonoBehaviour:
   surfaceAttributes: {fileID: 11400000, guid: 151825ce3eaec58449e201d2639e67ea, type: 2}
   boxCollider: {fileID: 0}
   passthrough: 1
+  walljump: 1
   enableMotion: 1
   movementOffset: {x: 0, y: 10, z: 0}
   movementSpeed: 3
   enableRotation: 0
   rotationSpeed: 0
   lockedUntilPlayer: 0
+  generateTriggers: 1
   directionUp: 0
 --- !u!65 &1654537522
 BoxCollider:
@@ -5286,6 +5304,87 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1852319690}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &1881591702
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1881591706}
+  - component: {fileID: 1881591705}
+  - component: {fileID: 1881591704}
+  m_Layer: 0
+  m_Name: Sphere
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!23 &1881591704
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1881591702}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 8819c4a0d06c69c4a884a2a91fc9b159, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!33 &1881591705
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1881591702}
+  m_Mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!4 &1881591706
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1881591702}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0.26, z: -3.33}
+  m_LocalScale: {x: 4, y: 4, z: 4}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 8
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &1956138884 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2152440083363377099, guid: 2c1f84fb511ff184fade59859ef27054, type: 3}

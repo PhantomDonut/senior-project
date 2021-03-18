@@ -15,7 +15,7 @@ public class PlayerController : MonoBehaviour {
 
     Vector3 movementVelocity;
     Vector3 verticalVelocity;
-    private const int TERMINAL_VELOCITY = 50;
+    private const int TERMINAL_VELOCITY = 30;
     private Vector3 terminalVertical;
 
     Vector3 movementTotal;
@@ -105,7 +105,7 @@ public class PlayerController : MonoBehaviour {
         Vector3 frameVelocity = movementTotal + verticalVelocity;
         if (collisionInfo.slidingLastFrame && !collisionInfo.sliding && collisionInfo.grounded) StartCoroutine(SlideExitFriction());
         friction /= globalFrictionMultiplier;
-        frameVelocity = new Vector3(Mathf.Lerp(collisionInfo.velocityPriorFrame.x, frameVelocity.x, friction), frameVelocity.y, Mathf.Lerp(collisionInfo.velocityPriorFrame.z, frameVelocity.z, friction));
+        //frameVelocity = new Vector3(Mathf.Lerp(collisionInfo.velocityPriorFrame.x, frameVelocity.x, friction), frameVelocity.y, Mathf.Lerp(collisionInfo.velocityPriorFrame.z, frameVelocity.z, friction));
         collisionInfo.velocity = frameVelocity;
         return collisionInfo;
     }
@@ -126,7 +126,7 @@ public class PlayerController : MonoBehaviour {
         if (Physics.BoxCast(transform.position, new Vector3(bounds.extents.x, 0.0125f, bounds.extents.z), -Vector3.up, out hitInfo, transform.rotation, height + heightPadding, ground) && !justJumped) {
             if (Vector3.Distance(transform.position, hitInfo.point) < height) {
                 //Keep position leveled to the ground to prevent clipping
-                transform.position = Vector3.Lerp(transform.position, transform.position + Vector3.up * height, 5 * Time.deltaTime);
+                transform.position = Vector3.Lerp(transform.position, transform.position + Vector3.up * height, 5 * Time.fixedDeltaTime);
             }
             hitSurface = hitInfo.transform.gameObject.GetComponent<Surface>();
             if (hitSurface != null) {
@@ -156,12 +156,12 @@ public class PlayerController : MonoBehaviour {
 
     void ApplyGravity(bool onWall) {
         if (!collisionInfo.grounded && !onWall) {
-            verticalVelocity += gravity * Time.deltaTime;
+            verticalVelocity += gravity * Time.fixedDeltaTime;
             if (verticalVelocity.y < -TERMINAL_VELOCITY) {
                 verticalVelocity = terminalVertical;
             }
         } else if (onWall) {
-            verticalVelocity += wallslideSpeed * Time.deltaTime;
+            verticalVelocity += wallslideSpeed * Time.fixedDeltaTime;
         } else if (!justBounced) {
             verticalVelocity = Vector3.zero;
         }

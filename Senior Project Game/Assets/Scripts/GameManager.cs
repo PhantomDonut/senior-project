@@ -20,6 +20,9 @@ public class GameManager : Singleton<GameManager> {
     [SerializeField] private SurfaceType defaultSurface;
     public SurfaceType GetDefaultSurface() { return defaultSurface; }
 
+    private void Start() {
+        Application.targetFrameRate = -1;
+    }
 
     private void Update() {
         if(gameState == GameState.Regular) {

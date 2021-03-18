@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ce981e133472ef849b688ad346840a80, type: 3}
+  m_Name: Daytime
+  m_EditorClassIdentifier: 
+  fogColor: {r: 1, g: 1, b: 1, a: 1}
+  ambientHorizon: {r: 0.81960785, g: 0.8117647, b: 0.41568628, a: 1}
+  ambientSky: {r: 0.6431373, g: 0.78431374, b: 0.8784314, a: 0}
+  sunDirection: {x: 0, y: 0, z: 0, w: 0}
+  skyboxHorizon: {r: 0.1764706, g: 0.98039216, b: 1, a: 1}
+  skyboxSky: {r: 0.43137255, g: 0.5568628, b: 0.6509804, a: 1}
+  waterShallow: {r: 0.5137255, g: 0.85490197, b: 0.85882354, a: 1}
+  waterDeep: {r: 0.21960784, g: 0.8, b: 0.9529412, a: 1}
+  lightRotation: {x: 50, y: -30, z: 0}
+  lightColor: {r: 1, g: 1, b: 1, a: 1}
+  lightIntensity: 0.95

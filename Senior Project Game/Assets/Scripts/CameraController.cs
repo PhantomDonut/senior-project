@@ -30,6 +30,8 @@ public class CameraController : MonoBehaviour {
         }
     }
 
+    private float secondLerpPercent;
+
     private void MoveWithTarget() {
         targetPosition = positionTarget.position + offsetPosition;
         transform.position = Vector3.Lerp(transform.position, targetPosition, moveSpeed * Time.deltaTime);

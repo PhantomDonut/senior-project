@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ce981e133472ef849b688ad346840a80, type: 3}
+  m_Name: Night
+  m_EditorClassIdentifier: 
+  fogColor: {r: 0.13333334, g: 0.14901961, b: 0.3882353, a: 1}
+  ambientHorizon: {r: 0.40784314, g: 0.4745098, b: 0.50980395, a: 0}
+  ambientSky: {r: 0.22352941, g: 0.28627452, b: 0.28235295, a: 0}
+  sunDirection: {x: 0, y: 0, z: 0, w: 0}
+  skyboxHorizon: {r: 0.101960786, g: 0.14509805, b: 0.3882353, a: 1}
+  skyboxSky: {r: 0.43137255, g: 0.5803922, b: 0.6509804, a: 1}
+  waterShallow: {r: 0.43654326, g: 0.844369, b: 0.8490566, a: 1}
+  waterDeep: {r: 0.105882354, g: 0.3372549, b: 0.54901963, a: 1}
+  lightRotation: {x: 50, y: -50, z: 0}
+  lightColor: {r: 0.8156863, g: 0.9411765, b: 0.94509804, a: 1}
+  lightIntensity: 0.8

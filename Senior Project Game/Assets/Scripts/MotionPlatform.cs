@@ -6,13 +6,14 @@ using Sirenix.OdinInspector;
 public class MotionPlatform : Surface {
 
     public bool enableMotion;
+    public bool doubleSidedColliders;
     [ShowIf("enableMotion", true)] public Vector3 movementOffset;
     [ShowIf("enableMotion", true)] Vector3 startingPosition;
     [ShowIf("enableMotion", true)] [Range(0.5f, 6)] public float movementSpeed;
     private float trueMovementSpeed;
     public bool enableRotation;
-    [ShowIf("enableRotation", true)] public float rotationSpeed;
-    private float trueRotationSpeed;
+    [ShowIf("enableRotation", true)] public Vector3 rotationSpeed;
+    private Vector3 trueRotationSpeed;
     [ShowIf("enableMotion", true)] public bool lockedUntilPlayer;
     private bool motionLockedState = true;
     private float startTime;
@@ -21,7 +22,10 @@ public class MotionPlatform : Surface {
 
     new void Start() {
         base.Start();
-        if(generateTriggers) new GameObject("Motion").AddComponent<SurfaceTrigger>().Create(this, SurfaceTriggerType.Motion);
+        if (generateTriggers) {
+            new GameObject("Motion").AddComponent<SurfaceTrigger>().Create(this, SurfaceTriggerType.Motion);
+            if(doubleSidedColliders) new GameObject("Motion Double Side").AddComponent<SurfaceTrigger>().Create(this, SurfaceTriggerType.Motion, true);
+        }
         Rigidbody rb = gameObject.AddComponent<Rigidbody>();
         rb.isKinematic = true;
         rb.useGravity = false;
@@ -35,7 +39,9 @@ public class MotionPlatform : Surface {
             trueMovementSpeed = movementSpeed / units;
         }
         if(enableRotation) {
-            trueRotationSpeed = 360 / rotationSpeed;
+            trueRotationSpeed = new Vector3(rotationSpeed.x != 0 ? 360 / rotationSpeed.x : 0, 
+                rotationSpeed.y != 0 ? 360 / rotationSpeed.y : 0, 
+                rotationSpeed.z != 0 ? 360 / rotationSpeed.z : 0);
         }
     }
 
@@ -48,7 +54,9 @@ public class MotionPlatform : Surface {
         }
         if(enableRotation && (!lockedUntilPlayer || (lockedUntilPlayer && !motionLockedState))) {
             float time = lockedUntilPlayer ? (GameManager.GamePhysicsTime - startTime) : GameManager.GamePhysicsTime;
-            transform.rotation = Quaternion.Euler(transform.rotation.x, (time * trueRotationSpeed) % 360, transform.rotation.z);
+            transform.rotation = Quaternion.Euler(trueRotationSpeed.x != 0 ? (time * trueRotationSpeed.x) % 360 : transform.rotation.x, 
+                trueRotationSpeed.y != 0 ? (time * trueRotationSpeed.y) % 360 : transform.rotation.y,
+                trueRotationSpeed.z != 0 ? (time * trueRotationSpeed.z) % 360 : transform.rotation.z);
         }
     }
 

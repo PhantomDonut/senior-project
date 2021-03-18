@@ -62,6 +62,11 @@ public class Player : MonoBehaviour {
     Quaternion targetRotation;
     public float visualMoveSpeed = 15;
     private Vector2 velocity2D;
+    [SerializeField] private Transform blobShadow;
+    [SerializeField] private float blobShadowMaxDistance = 10;
+    [SerializeField] private AnimationCurve blobShadowOpacity;
+    private Material blobShadowMaterial;
+    const float BLOB_MAX_OPACITY = 0.625f;
 
     [Header("Interaction")]
     public bool justTeleported;
@@ -87,6 +92,8 @@ public class Player : MonoBehaviour {
         rigidbody.inertiaTensor = new Vector3(1, 1, 1);
 
         animator = visual.GetComponentInChildren<Animator>();
+
+        //blobShadowMaterial = blobShadow.GetComponent<MeshRenderer>().sharedMaterial;
     }
 
     private void Update() {
@@ -161,8 +168,13 @@ public class Player : MonoBehaviour {
     }
 
     private void LateUpdate() {
-        Vector3 targetPosition = transform.position;
-        visual.transform.position = Vector3.Lerp(visual.transform.position, targetPosition, visualMoveSpeed * Time.deltaTime);
+        //Vector3 targetPosition = transform.position;
+        //visual.transform.position = Vector3.Lerp(visual.transform.position, targetPosition, visualMoveSpeed * Time.deltaTime);
+        /*RaycastHit blobShadowHit;
+        if (Physics.Raycast(visual.position + new Vector3(0, 0.5f, 0), -visual.transform.up, out blobShadowHit, Mathf.Infinity, playerController.ground)) {
+            blobShadow.position = new Vector3(visual.position.x, blobShadowHit.point.y, visual.position.z);
+            blobShadowMaterial.SetColor("_BaseColor", new Color(0, 0, 0, BLOB_MAX_OPACITY * blobShadowOpacity.Evaluate(Mathf.InverseLerp(0, blobShadowMaxDistance, blobShadowHit.distance - 1))));
+        }*/
     }
 
     private void CalculateDirection() {
