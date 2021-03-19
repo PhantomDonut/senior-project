@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Daytime
   m_EditorClassIdentifier: 
   fogColor: {r: 1, g: 1, b: 1, a: 1}
-  ambientHorizon: {r: 0.81960785, g: 0.8117647, b: 0.41568628, a: 1}
+  ambientHorizon: {r: 0.91764706, g: 0.9098039, b: 0.627451, a: 1}
   ambientSky: {r: 0.6431373, g: 0.78431374, b: 0.8784314, a: 0}
   sunDirection: {x: 0, y: 0, z: 0, w: 0}
   skyboxHorizon: {r: 0.1764706, g: 0.98039216, b: 1, a: 1}

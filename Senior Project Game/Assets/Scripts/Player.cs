@@ -67,9 +67,14 @@ public class Player : MonoBehaviour {
     [SerializeField] private AnimationCurve blobShadowOpacity;
     private Material blobShadowMaterial;
     const float BLOB_MAX_OPACITY = 0.625f;
+    [SerializeField] private ParticleSystem footstepParticleSystem;
+    [SerializeField] private ParticleSystem footstepPoofParticleSystem;
+    [SerializeField] private TrailRenderer[] spinRenderers;
 
     [Header("Interaction")]
     public bool justTeleported;
+    private bool spinning;
+    private bool spinQueued;
 
     [Header("Debug")]
     public bool debug;
@@ -129,6 +134,11 @@ public class Player : MonoBehaviour {
         jumpCounterText.text = string.Format("Jumps: {0} Queued: {1}", jumpsRemaining, jumpQueued);
 
         AnimatePlayer(inputManager.LateralInputExists, savedRotation);
+
+        if(Input.GetMouseButtonDown(0) && !spinning && !onWall) {
+            spinQueued = true;
+            StartCoroutine(ActivateSpin());
+        }
     }
 
     private void FixedUpdate() {
@@ -145,12 +155,19 @@ public class Player : MonoBehaviour {
         }
 
         //Leaving Ground Frame
-        if (collisionInfo.groundedLastFrame && !collisionInfo.grounded) jumpsRemaining = extraJumps;
+        if (collisionInfo.groundedLastFrame && !collisionInfo.grounded) {
+            jumpsRemaining = extraJumps;
+            footstepParticleSystem.Stop();
+        }
 
         //Landing Frame
-        if (!collisionInfo.groundedLastFrame && collisionInfo.grounded) StartCoroutine(Landing());
+        if (!collisionInfo.groundedLastFrame && collisionInfo.grounded) {
+            StartCoroutine(Landing());
+            footstepParticleSystem.Play();
+            footstepPoofParticleSystem.Emit(20);
+        }
 
-        collisionInfo = playerController.CalculateFrameVelocity(input, speed, validJump, inputManager.JumpKeyUp, justJumped, onWall, wallNormal, globalMovementModifier);
+        collisionInfo = playerController.CalculateFrameVelocity(input, speed, validJump, inputManager.JumpKeyUp, justJumped, onWall, wallNormal, globalMovementModifier, spinQueued);
         rigidbody.velocity = collisionInfo.velocity;
         velocity2D.x = rigidbody.velocity.x;
         velocity2D.y = rigidbody.velocity.z;
@@ -164,12 +181,14 @@ public class Player : MonoBehaviour {
             StartCoroutine(ExitWalljump(true));
         }
 
+        spinQueued = false;
+
         if (debug) DrawDebugLines();
     }
 
     private void LateUpdate() {
-        //Vector3 targetPosition = transform.position;
-        //visual.transform.position = Vector3.Lerp(visual.transform.position, targetPosition, visualMoveSpeed * Time.deltaTime);
+        Vector3 targetPosition = transform.position;
+        visual.transform.position = Vector3.Lerp(visual.transform.position, targetPosition, visualMoveSpeed * Time.deltaTime);
         /*RaycastHit blobShadowHit;
         if (Physics.Raycast(visual.position + new Vector3(0, 0.5f, 0), -visual.transform.up, out blobShadowHit, Mathf.Infinity, playerController.ground)) {
             blobShadow.position = new Vector3(visual.position.x, blobShadowHit.point.y, visual.position.z);
@@ -195,13 +214,29 @@ public class Player : MonoBehaviour {
         animator.SetBool("Sliding", collisionInfo.sliding);
         animator.SetFloat("Vertical Velocity", Mathf.InverseLerp(-10, 10, collisionInfo.velocity.y));
         animator.SetBool("Holding Wall", onWall);
-        
+
         float velocityAngle = Mathf.Atan2(collisionInfo.velocity.x, collisionInfo.velocity.z) * Mathf.Rad2Deg;
 
         targetRotation = Quaternion.Euler(0, (!onWall ? (horizontalInputExists ? angle : (velocity2D.magnitude > 0.5f ? collisionInfo.grounded ? velocityAngle : transform.eulerAngles.y : transform.eulerAngles.y)) : 180 + Mathf.Atan2(wallNormal.x, wallNormal.z) * Mathf.Rad2Deg), 0); 
         
         float lerpTime = onWall ? 0.75f : velocity2D.magnitude > 0.1f ? Mathf.Clamp01(Mathf.InverseLerp(0, 2, Mathf.Abs(collisionInfo.velocity.x)) + Mathf.InverseLerp(0, 2, Mathf.Abs(collisionInfo.velocity.z))) : 1;
         visual.rotation = Quaternion.Slerp(savedRotation, targetRotation, Time.deltaTime * visualTurnSpeed * lerpTime);
+    }
+
+    IEnumerator ActivateSpin() {
+        spinning = true;
+        animator.SetTrigger("Spin");
+        animator.SetBool("Disable Transition", true);
+        yield return new WaitForSeconds(0.1f);
+        for(int i = 0; i < spinRenderers.Length; i++) {
+            spinRenderers[i].emitting = true;
+        }
+        yield return new WaitForSeconds(0.45f);
+        for (int i = 0; i < spinRenderers.Length; i++) {
+            spinRenderers[i].emitting = false;
+        }
+        spinning = false;
+        animator.SetBool("Disable Transition", false);
     }
 
     IEnumerator JumpReset() {

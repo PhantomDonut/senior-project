@@ -52,7 +52,7 @@ public class PlayerController : MonoBehaviour {
         height = 0.5f;
         terminalVertical = new Vector3(0, -TERMINAL_VELOCITY, 0);
     }
-    public CollisionInfo CalculateFrameVelocity(Vector2 input, float speed, bool validJump, bool jumpKeyUp, bool justJumped, bool onWall, Vector3 wallNormal, float movementModifier) {
+    public CollisionInfo CalculateFrameVelocity(Vector2 input, float speed, bool validJump, bool jumpKeyUp, bool justJumped, bool onWall, Vector3 wallNormal, float movementModifier, bool spinFrame) {
         collisionInfo.velocityPriorFrame = collisionInfo.velocity;
         collisionInfo.slidingLastFrame = collisionInfo.sliding;
 
@@ -95,6 +95,12 @@ public class PlayerController : MonoBehaviour {
 
         ApplyGravity(onWall);
 
+        if (spinFrame && !collisionInfo.grounded) {
+            verticalVelocity.x += movementVelocity.x * 0.75f;
+            verticalVelocity.z += movementVelocity.z * 0.75f;
+            verticalVelocity.y = Mathf.Max(5, verticalVelocity.y);
+        }
+
         movementVelocity = Vector3.zero;
         if(Mathf.Abs(input.x) + Mathf.Abs(input.y) > 0) {
             Move(speed);
@@ -105,7 +111,7 @@ public class PlayerController : MonoBehaviour {
         Vector3 frameVelocity = movementTotal + verticalVelocity;
         if (collisionInfo.slidingLastFrame && !collisionInfo.sliding && collisionInfo.grounded) StartCoroutine(SlideExitFriction());
         friction /= globalFrictionMultiplier;
-        //frameVelocity = new Vector3(Mathf.Lerp(collisionInfo.velocityPriorFrame.x, frameVelocity.x, friction), frameVelocity.y, Mathf.Lerp(collisionInfo.velocityPriorFrame.z, frameVelocity.z, friction));
+        frameVelocity = new Vector3(Mathf.Lerp(collisionInfo.velocityPriorFrame.x, frameVelocity.x, friction), frameVelocity.y, Mathf.Lerp(collisionInfo.velocityPriorFrame.z, frameVelocity.z, friction));
         collisionInfo.velocity = frameVelocity;
         return collisionInfo;
     }

@@ -11,7 +11,6 @@ public class Surface : MonoBehaviour {
     private const int PASSTHROUGH_LAYER = 11;
 
     public void Start() {
-        if(surfaceAttributes == null) { surfaceAttributes = GameManager.Instance.GetDefaultSurface(); }
         boxCollider = GetComponent<BoxCollider>();
         if (passthrough) {
             new GameObject("Passthrough").AddComponent<SurfaceTrigger>().Create(this, SurfaceTriggerType.Passthrough);
