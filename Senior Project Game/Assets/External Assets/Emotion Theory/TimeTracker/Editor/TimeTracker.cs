@@ -7,6 +7,8 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Linq;
 
+#pragma warning disable 0618
+
 [InitializeOnLoad]
 public static class TimeTrackerInitializer
 {

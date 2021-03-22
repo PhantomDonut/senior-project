@@ -13,24 +13,21 @@ public class Teleporter : MonoBehaviour {
     [SerializeField] bool keepRotation = true;
     [ShowIf("keepRotation", false)] [SerializeField] Vector3 exitRotation = Vector3.zero;
 
-    private Player player = null;
-
     private void Start() {
         teleportationPoint = transform.position + teleportationOffset;
-        player = GameManager.Instance.player;
     }
 
     private void OnTriggerEnter(Collider other) {
         if(other.transform.root.CompareTag("Player")) {
-            if (!player.justTeleported) Teleport(other.transform.root);
+            if (!GameManager.Instance.player.justTeleported) Teleport(other.transform.root);
         }
     }
 
     private void Teleport(Transform other) {
         other.position = pairedTeleporter.teleportationPoint;
         if (!pairedTeleporter.keepRotation) other.rotation = Quaternion.Euler(pairedTeleporter.exitRotation);
-        if (!pairedTeleporter.keepMomentum) player.CancelMomentum();
-        player.StartCoroutine("JustTeleported");
+        if (!pairedTeleporter.keepMomentum) GameManager.Instance.player.CancelMomentum();
+        GameManager.Instance.player.StartCoroutine("JustTeleported");
     }
 
 

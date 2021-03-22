@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class MaterialUVScroll : MonoBehaviour {
 
-    [SerializeField] private Vector2 scrollSpeed;
+    [SerializeField] private Vector2 scrollSpeed = Vector2.zero;
     private Material material;
     private Vector2 offset;
 

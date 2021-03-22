@@ -56,14 +56,14 @@ public class Player : MonoBehaviour {
     [Header("Visuals")]
     public Transform visual;
     private Animator animator;
-    CameraController playerCamera;
+    [HideInInspector] public CameraController playerCamera;
     float angle;
     public float visualTurnSpeed = 10;
     Quaternion targetRotation;
     public float visualMoveSpeed = 15;
     private Vector2 velocity2D;
     [SerializeField] private Transform blobShadow;
-    [SerializeField] private float blobShadowMaxDistance = 10;
+    //[SerializeField] private float blobShadowMaxDistance = 10;
     [SerializeField] private AnimationCurve blobShadowOpacity;
     private Material blobShadowMaterial;
     const float BLOB_MAX_OPACITY = 0.625f;
@@ -75,6 +75,7 @@ public class Player : MonoBehaviour {
     public bool justTeleported;
     private bool spinning;
     private bool spinQueued;
+    private bool hasSpin = true;
 
     [Header("Debug")]
     public bool debug;
@@ -135,7 +136,7 @@ public class Player : MonoBehaviour {
 
         AnimatePlayer(inputManager.LateralInputExists, savedRotation);
 
-        if(Input.GetMouseButtonDown(0) && !spinning && !onWall) {
+        if(Input.GetMouseButtonDown(0) && !spinning && !onWall && hasSpin) {
             spinQueued = true;
             StartCoroutine(ActivateSpin());
         }
@@ -166,6 +167,8 @@ public class Player : MonoBehaviour {
             footstepParticleSystem.Play();
             footstepPoofParticleSystem.Emit(20);
         }
+
+        if(!hasSpin) hasSpin = collisionInfo.grounded && !(collisionInfo.sliding || collisionInfo.slidingLastFrame);
 
         collisionInfo = playerController.CalculateFrameVelocity(input, speed, validJump, inputManager.JumpKeyUp, justJumped, onWall, wallNormal, globalMovementModifier, spinQueued);
         rigidbody.velocity = collisionInfo.velocity;
@@ -215,6 +218,12 @@ public class Player : MonoBehaviour {
         animator.SetFloat("Vertical Velocity", Mathf.InverseLerp(-10, 10, collisionInfo.velocity.y));
         animator.SetBool("Holding Wall", onWall);
 
+        if(horizontalInputExists && collisionInfo.grounded) {
+            if (!footstepParticleSystem.isPlaying) footstepParticleSystem.Play();
+        } else {
+            footstepParticleSystem.Stop();
+        }
+
         float velocityAngle = Mathf.Atan2(collisionInfo.velocity.x, collisionInfo.velocity.z) * Mathf.Rad2Deg;
 
         targetRotation = Quaternion.Euler(0, (!onWall ? (horizontalInputExists ? angle : (velocity2D.magnitude > 0.5f ? collisionInfo.grounded ? velocityAngle : transform.eulerAngles.y : transform.eulerAngles.y)) : 180 + Mathf.Atan2(wallNormal.x, wallNormal.z) * Mathf.Rad2Deg), 0); 
@@ -225,6 +234,7 @@ public class Player : MonoBehaviour {
 
     IEnumerator ActivateSpin() {
         spinning = true;
+        hasSpin = false;
         animator.SetTrigger("Spin");
         animator.SetBool("Disable Transition", true);
         yield return new WaitForSeconds(0.1f);
@@ -325,6 +335,14 @@ public class Player : MonoBehaviour {
             StartCoroutine(ExitWalljump(false));
         }
     }
+
+    private void OnTriggerEnter(Collider other) {
+        if (other.gameObject.layer == LayerMask.NameToLayer("Collectible")) {
+            Collectible collectible = other.gameObject.GetComponent<Collectible>();
+            if(!collectible.collected) collectible.Pickup(transform);
+        }
+    }
+
     void DrawDebugLines() {
         Debug.DrawLine(transform.position, transform.position + collisionInfo.forward * 0.5f * 2, Color.blue);
         Debug.DrawLine(transform.position, transform.position - Vector3.up * 0.5f, Color.green);

@@ -8,4 +8,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Grass.unity
     guid: 049271818992ab547b794a09e5887a50
+  - enabled: 1
+    path: Assets/Scenes/Components.unity
+    guid: f8d1d890f6aff0547a708cffa49d7aac
   m_configObjects: {}

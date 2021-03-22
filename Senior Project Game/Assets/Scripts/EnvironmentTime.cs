@@ -6,6 +6,7 @@ using UnityEngine;
 public class EnvironmentTime : MonoBehaviour {
 
     public Light mainLight;
+    public bool sceneHasWater;
     public Material waterMaterial;
     public Material skyboxMaterial;
 
@@ -26,8 +27,10 @@ public class EnvironmentTime : MonoBehaviour {
         skyboxMaterial.SetVector("_SunDirection", timeColorSet.sunDirection);
         skyboxMaterial.SetColor("_HorizonColor", timeColorSet.skyboxHorizon);
         skyboxMaterial.SetColor("_SkyColor", timeColorSet.skyboxSky);
-        waterMaterial.SetColor("Color_F01C36BF", timeColorSet.waterShallow);
-        waterMaterial.SetColor("Color_7D9A58EC", timeColorSet.waterDeep);
+        if (sceneHasWater) {
+            waterMaterial.SetColor("Color_F01C36BF", timeColorSet.waterShallow);
+            waterMaterial.SetColor("Color_7D9A58EC", timeColorSet.waterDeep);
+        }
         mainLight.transform.rotation = Quaternion.Euler(timeColorSet.lightRotation);
         mainLight.color = timeColorSet.lightColor;
         mainLight.intensity = timeColorSet.lightIntensity;

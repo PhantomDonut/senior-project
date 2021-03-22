@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
+using UnityEngine.SceneManagement;
 
 #pragma warning disable 0649
 public enum GameState {Regular, Paused}
@@ -16,6 +17,16 @@ public class GameManager : Singleton<GameManager> {
     [HideInInspector] public bool countPlayTime = true;
 
     public Player player;
+
+    private void Start() {
+        StartCoroutine(LoadComponentObjects());
+    }
+
+    IEnumerator LoadComponentObjects() {
+        yield return SceneManager.LoadSceneAsync("Components", LoadSceneMode.Additive);
+        player = GameObject.FindObjectOfType<Player>();
+        Debug.Log(player);
+    }
 
     private void Update() {
         if(gameState == GameState.Regular) {
