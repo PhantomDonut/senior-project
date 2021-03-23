@@ -554,6 +554,7 @@ GameObject:
   m_Component:
   - component: {fileID: 146181478}
   - component: {fileID: 146181479}
+  - component: {fileID: 146181481}
   m_Layer: 8
   m_Name: Player Contact
   m_TagString: Player Contact
@@ -588,6 +589,14 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 0.5, y: 0.1, z: 0.5}
   m_Center: {x: 0, y: 0.06, z: 0}
+--- !u!33 &146181481
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 146181477}
+  m_Mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!1001 &149504743
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1814,10 +1823,10 @@ MonoBehaviour:
   wallSlideSpeed: 0.3
   onPlatform: 0
   visual: {fileID: 1534356566}
+  playerCamera: {fileID: 0}
   visualTurnSpeed: 15
   visualMoveSpeed: 10
   blobShadow: {fileID: 1595232066}
-  blobShadowMaxDistance: 10
   blobShadowOpacity:
     serializedVersion: 2
     m_Curve:
@@ -12379,6 +12388,7 @@ MonoBehaviour:
   gameState: 0
   countPlayTime: 1
   player: {fileID: 707752239}
+  localScenePlayerPosition: {fileID: 0}
 --- !u!4 &1163034249
 Transform:
   m_ObjectHideFlags: 0

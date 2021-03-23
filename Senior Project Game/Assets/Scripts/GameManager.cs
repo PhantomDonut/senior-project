@@ -17,6 +17,7 @@ public class GameManager : Singleton<GameManager> {
     [HideInInspector] public bool countPlayTime = true;
 
     public Player player;
+    public Transform localScenePlayerPosition;
 
     private void Start() {
         StartCoroutine(LoadComponentObjects());
@@ -48,6 +49,10 @@ public class GameManager : Singleton<GameManager> {
         if (gameState != GameState.Paused && countPlayTime) {
             PlayTime += Time.deltaTime;
         }
+    }
+
+    private void LateUpdate() {
+        if(player != null) localScenePlayerPosition.position = player.visual.transform.position;
     }
 
     public void FullGameQuit() {
