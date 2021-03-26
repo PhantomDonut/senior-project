@@ -6,19 +6,23 @@ public class CameraController : MonoBehaviour {
 
     public Transform positionTarget;
     public Transform rotationTarget;
-    private Vector3 offsetPosition;
+
+    public Transform cameraTransform;
+    public Transform idealTarget;
+
+    //private Vector3 offsetPosition;
     public float moveSpeed = 5;
     public float turnSpeed = 10;
     public float smoothSpeed = 0.5f;
 
     Quaternion targetRotation;
     Vector3 targetPosition;
-    bool smoothRotating = false;
 
     public LayerMask layerMask;
     public float maximumHeightAbove = 5;
 
     public float sharpRotationAngle;
+    public float trueRotationAngle;
 
     public CameraControllerSettings defaultCameraSettings;
     [HideInInspector]
@@ -30,27 +34,14 @@ public class CameraController : MonoBehaviour {
 
     private void Start() {
         cameraSettings = defaultCameraSettings;
-        offsetPosition = cameraSettings.offsetPosition;
+        //offsetPosition = cameraSettings.offsetPosition;
+        cameraTransform = Camera.main.transform;
+        idealTarget = GameObject.Find("Ideal Position").transform;
     }
 
     private void Update() {
-        //if(Input.GetInput())
-    }
-
-    private void LateUpdate() {
-        if(!fullControl) MoveWithTarget();
-        if (fullControl) {
-            chosenAngles.x = Mathf.Clamp(chosenAngles.x + Input.GetAxis("Mouse Y") * 1, 16, 42);
-            chosenAngles.y += Input.GetAxis("Mouse X") * 1;
-            sharpRotationAngle = chosenAngles.y;
-            idealPosition = MatrixMagicRotate(positionTarget.position, cameraSettings.offsetPosition.magnitude, chosenAngles);
-            //transform.LookAt(positionTarget.position);
-            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(rotationTarget.position - transform.position), turnSpeed * Time.deltaTime);
-            transform.position = Vector3.Lerp(transform.position, idealPosition, moveSpeed * Time.deltaTime);
-        }
-
-        if(Input.GetKeyDown(KeyCode.G) && !smoothRotating) {
-            StartCoroutine("RotateAroundTarget", 45);
+        if (Input.GetKeyDown(KeyCode.G)) {
+            sharpRotationAngle += 45;
         }
 
         if (Input.GetKeyDown(KeyCode.F)) {
@@ -58,57 +49,50 @@ public class CameraController : MonoBehaviour {
             Cursor.visible = !fullControl;
             if (fullControl) {
                 Cursor.lockState = CursorLockMode.Locked;
-            } else {
+            }
+            else {
                 Cursor.lockState = CursorLockMode.None;
             }
         }
+
+        if(fullControl) {
+            chosenAngles.x = Mathf.Clamp(chosenAngles.x + Input.GetAxis("Mouse Y") * 1, -20, 30);
+            chosenAngles.y += Input.GetAxis("Mouse X") * 2;
+            chosenAngles.y += Input.GetAxis("Horizontal");
+        }
     }
 
-    private void MoveWithTarget() {
-        targetPosition = positionTarget.position + offsetPosition;
+    private void LateUpdate() {
+        MoveWithTarget(fullControl);
+        trueRotationAngle = cameraTransform.rotation.eulerAngles.y;
+    }
+
+    private void MoveWithTarget(bool freeform) {
+        transform.position = Vector3.Lerp(transform.position, positionTarget.position, moveSpeed * Time.deltaTime);
+
         RaycastHit linecastHit;
-        float maxPotentialDistance = Vector3.Distance(positionTarget.position, targetPosition);
+        float maxPotentialDistance = Vector3.Distance(positionTarget.position, idealTarget.position);
         float distance = maxPotentialDistance;
-        if (Physics.Linecast(positionTarget.position, positionTarget.position + offsetPosition, out linecastHit, layerMask)) {
-            Debug.Log("blocked");
-            targetPosition = linecastHit.point;
-            targetPosition.y = Mathf.Max(positionTarget.position.y + maximumHeightAbove, targetPosition.y);
+        Vector3 localCamera = cameraSettings.offsetPosition;
+        if (Physics.Linecast(positionTarget.position, idealTarget.position, out linecastHit, layerMask)) {
+            //Debug.Log("blocked");
+            localCamera = transform.InverseTransformPoint(linecastHit.point);
             distance = linecastHit.distance;
         }
-
-        Vector3 eulerIdeal = new Vector3(Mathf.Lerp(18, 60, Mathf.InverseLerp(maxPotentialDistance, 0, distance)), sharpRotationAngle, 0);
-        transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(eulerIdeal), turnSpeed * Time.deltaTime);
-        transform.position = Vector3.Lerp(transform.position, targetPosition, moveSpeed * Time.deltaTime);
-    }
-
-    /*private IEnumerator RotateAroundTarget(float angle) {
-        Vector3 velocity = Vector3.zero;
-        sharpRotationAngle += angle;
-        Vector3 targetOffsetPosition = Quaternion.Euler(0, angle, 0) * cameraSettings.offsetPosition;
-        float distance = Vector3.Distance(cameraSettings.offsetPosition, targetOffsetPosition);
-        smoothRotating = true;
-        
-        while(distance > 0.02f) {
-            cameraSettings.offsetPosition = Vector3.SmoothDamp(cameraSettings.offsetPosition, targetOffsetPosition, ref velocity, smoothSpeed);
-
-            distance = Vector3.Distance(cameraSettings.offsetPosition, targetOffsetPosition);
-
-            targetRotation = Quaternion.LookRotation(rotationTarget.position - transform.position);
-            Vector3 tempRotation = Quaternion.Slerp(transform.rotation, targetRotation, turnSpeed * Time.deltaTime).eulerAngles;
-            transform.rotation = Quaternion.Euler(transform.eulerAngles.x, tempRotation.y, transform.rotation.z);
-            yield return null;
+        //Vector3 localCamera = cameraSettings.offsetPosition.normalized * (distance - 0.25f);
+        localCamera.y = Mathf.Max(maximumHeightAbove, localCamera.y);
+        cameraTransform.localPosition = Vector3.Lerp(cameraTransform.localPosition, localCamera, moveSpeed * Time.deltaTime); ;
+        idealTarget.localPosition = cameraSettings.offsetPosition;
+        cameraTransform.localRotation = Quaternion.Slerp(cameraTransform.localRotation, Quaternion.Euler(Mathf.Lerp(18, 60, Mathf.InverseLerp(maxPotentialDistance, 0, distance)), 0, 0), turnSpeed * Time.deltaTime);
+        Quaternion intendedRotation = Quaternion.identity;
+        if (freeform) {
+            sharpRotationAngle = chosenAngles.y;
+            intendedRotation = Quaternion.Euler(chosenAngles);
+        } else {
+            intendedRotation = Quaternion.Euler(0, sharpRotationAngle, 0);
         }
-
-        smoothRotating = false;
-        cameraSettings.offsetPosition = targetOffsetPosition;
-    }*/
-
-    private IEnumerator RotateAroundTarget(float angle) {
-        sharpRotationAngle += angle;
-        //offsetPosition = RotatePointAroundPivot(transform.position, positionTarget.position, new Vector3(0, sharpRotationAngle, 0));
-        yield return new WaitForSeconds(0);
+        transform.rotation = Quaternion.Slerp(transform.rotation, intendedRotation, turnSpeed * Time.deltaTime);
     }
-
 
 
     public Vector3 MatrixMagicRotate(Vector3 pivot, float distance, Vector3 angles) {
@@ -120,6 +104,12 @@ public class CameraController : MonoBehaviour {
 
     public void SwapCameraControllerSettings(CameraControllerSettings settings) {
         cameraSettings = (settings != null) ? settings : defaultCameraSettings;
+        if(cameraSettings.angleOverride) {
+            sharpRotationAngle = cameraSettings.sharpRotationAngle;
+            chosenAngles.y = sharpRotationAngle;
+            chosenAngles.x = 0;
+        }
+        fullControl = cameraSettings.allowControl;
     }
 }
 
@@ -127,4 +117,7 @@ public class CameraController : MonoBehaviour {
 public class CameraControllerSettings {
     public bool followPlayer = true;
     public Vector3 offsetPosition;
+    public bool angleOverride;
+    public float sharpRotationAngle;
+    public bool allowControl;
 }

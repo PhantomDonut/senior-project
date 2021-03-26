@@ -28,10 +28,10 @@ public class MidasPowerup : Powerup, IDestroyable {
     public override void Pickup(Transform player) {
         base.Pickup(player);
         ApplyStatus(player.GetComponent<Player>());
-        StartCoroutine(DestroyObject(GameManager.Instance.player.transform));
+        StartCoroutine(DestroyObject());
     }
 
-    public IEnumerator DestroyObject(Transform player) {
+    public IEnumerator DestroyObject() {
         destructionParticles.Emit(10);
         /*float startingTime = GameManager.GameTime;
         while (GameManager.GameTime - startingTime < COLLECTION_TIME) {

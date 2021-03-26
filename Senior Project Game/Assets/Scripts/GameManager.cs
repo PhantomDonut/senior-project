@@ -17,6 +17,7 @@ public class GameManager : Singleton<GameManager> {
     [HideInInspector] public bool countPlayTime = true;
 
     public Player player;
+    public ObjectPoolManager poolManager;
     public Transform localScenePlayerPosition;
 
     private void Start() {

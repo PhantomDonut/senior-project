@@ -83,7 +83,7 @@ public class Player : MonoBehaviour {
 
     private void Start() {
         inputManager = GetComponent<PlayerInputManager>();
-        playerCamera = Camera.main.GetComponent<CameraController>();
+        playerCamera = Camera.main.transform.root.GetComponent<CameraController>();
 
         playerController = GetComponent<PlayerController>();
         playerController.gravity = new Vector3(0, -(2 * maxJumpHeight) / Mathf.Pow(timeToJumpApex, 2), 0);
@@ -186,6 +186,18 @@ public class Player : MonoBehaviour {
 
         spinQueued = false;
 
+        if(spinning) {
+            Collider[] spinHits = Physics.OverlapSphere(visual.position + new Vector3(0, 0.5f, 0), 0.65f);
+            for(int i = 0; i < spinHits.Length; i++) {
+                IHittable hittable;
+                if(spinHits[i].TryGetComponent(out hittable)) {
+                    Debug.Log("Find a hittable");
+                    if (hittable.QueryHitDelay()) hittable.Hit();
+                }
+            }
+
+        }
+
         if (debug) DrawDebugLines();
     }
 
@@ -202,7 +214,7 @@ public class Player : MonoBehaviour {
     private void CalculateDirection() {
         angle = Mathf.Atan2(input.x, input.y);
         angle *= Mathf.Rad2Deg;
-        angle += playerCamera.sharpRotationAngle;
+        angle += playerCamera.trueRotationAngle;
         targetRotation = Quaternion.Euler(0, angle, 0);
         transform.rotation = targetRotation;
     }
@@ -241,7 +253,7 @@ public class Player : MonoBehaviour {
         for(int i = 0; i < spinRenderers.Length; i++) {
             spinRenderers[i].emitting = true;
         }
-        yield return new WaitForSeconds(0.45f);
+        yield return new WaitForSeconds(0.4f);
         for (int i = 0; i < spinRenderers.Length; i++) {
             spinRenderers[i].emitting = false;
         }
