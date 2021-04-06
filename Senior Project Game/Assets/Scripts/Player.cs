@@ -132,7 +132,7 @@ public class Player : MonoBehaviour {
             jumpQueued = false;
         }
 
-        jumpCounterText.text = string.Format("Jumps: {0} Queued: {1}", jumpsRemaining, jumpQueued);
+        //jumpCounterText.text = string.Format("Jumps: {0} Queued: {1}", jumpsRemaining, jumpQueued);
 
         AnimatePlayer(inputManager.LateralInputExists, savedRotation);
 
@@ -187,7 +187,7 @@ public class Player : MonoBehaviour {
         spinQueued = false;
 
         if(spinning) {
-            Collider[] spinHits = Physics.OverlapSphere(visual.position + new Vector3(0, 0.5f, 0), 0.65f);
+            Collider[] spinHits = Physics.OverlapSphere(visual.position + new Vector3(0, 0.5f, 0), 0.8f);
             for(int i = 0; i < spinHits.Length; i++) {
                 IHittable hittable;
                 if(spinHits[i].TryGetComponent(out hittable)) {

@@ -31,7 +31,7 @@ public class Crate : MonoBehaviour, IHittable, IDestroyable {
 
         float ve = 3;
 
-        GameManager.Instance.poolManager.FetchPooledMulti("Coin", 4, transform.position, null, new Vector3(-ve, 3, -ve), new Vector3(ve, 5, ve));
+        GameManager.Instance.currentLevelManager.poolManager.FetchPooledMulti("Coin", 4, transform.position, null, new Vector3(-ve, 3, -ve), new Vector3(ve, 5, ve));
         yield return new WaitForSeconds(1.1f);
         Destroy(gameObject);
     }

@@ -65,6 +65,9 @@ public class CameraController : MonoBehaviour {
     private void LateUpdate() {
         MoveWithTarget(fullControl);
         trueRotationAngle = cameraTransform.rotation.eulerAngles.y;
+        Vector3 levelRot = cameraTransform.rotation.eulerAngles;
+        levelRot.z = 0;
+        cameraTransform.rotation = Quaternion.Euler(levelRot);
     }
 
     private void MoveWithTarget(bool freeform) {

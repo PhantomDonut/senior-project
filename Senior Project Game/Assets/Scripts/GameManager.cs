@@ -15,19 +15,20 @@ public class GameManager : Singleton<GameManager> {
     public static float GamePhysicsTime;
     public static float PlayTime;
     [HideInInspector] public bool countPlayTime = true;
+    public static bool IsGamePaused = true;
 
     public Player player;
-    public ObjectPoolManager poolManager;
-    public Transform localScenePlayerPosition;
+    public LevelManager currentLevelManager;
 
     private void Start() {
         StartCoroutine(LoadComponentObjects());
+        LevelSwitch();
     }
 
     IEnumerator LoadComponentObjects() {
         yield return SceneManager.LoadSceneAsync("Components", LoadSceneMode.Additive);
         player = GameObject.FindObjectOfType<Player>();
-        Debug.Log(player);
+        currentLevelManager.SetPlayer(player);
     }
 
     private void Update() {
@@ -38,6 +39,16 @@ public class GameManager : Singleton<GameManager> {
             PlayTime += Time.deltaTime;
         }
     }
+
+    public void TogglePause(bool invert = true, bool state = false) {
+        IsGamePaused = invert ? !IsGamePaused : state;
+        if(IsGamePaused) {
+
+        } else {
+
+        }
+    }
+
     public void ToggleCursorVisibility(bool visible) {
         Cursor.lockState = visible ? CursorLockMode.Confined : CursorLockMode.Locked;
         Cursor.visible = visible;
@@ -52,8 +63,8 @@ public class GameManager : Singleton<GameManager> {
         }
     }
 
-    private void LateUpdate() {
-        if(player != null) localScenePlayerPosition.position = player.visual.transform.position;
+    public void LevelSwitch() {
+        currentLevelManager = FindObjectOfType<LevelManager>();
     }
 
     public void FullGameQuit() {

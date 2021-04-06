@@ -9,6 +9,7 @@
 /Senior Project Game/[Bb]uilds/
 /Senior Project Game/[Ll]ogs/
 /Senior Project Game/[Mm]emoryCaptures/
+/Senior Project Game/[Aa]ssets/External Assets/
 
 # Asset meta data should only be ignored when the corresponding asset is also ignored
 !/Senior Project Game/[Aa]ssets/**/*.meta

@@ -3,7 +3,9 @@ guid: bc7f4abeb09993049a7cbb09b84ebcd2
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - surfaceAttributes: {fileID: 11400000, guid: 151825ce3eaec58449e201d2639e67ea, type: 2}
+  - boxCollider: {instanceID: 0}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

@@ -62,7 +62,7 @@ public class Coin : Collectible, IDestroyable, IPoolable {
         }
         visual.gameObject.SetActive(false);
         yield return new WaitForSeconds(1.1f);
-        GameManager.Instance.poolManager.ReturnToPool("Coin", this, gameObject);
+        GameManager.Instance.currentLevelManager.poolManager.ReturnToPool("Coin", this, gameObject);
     }
 
     public override void SetPhysicsState(bool state) {

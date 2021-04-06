@@ -1,14 +1,17 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Sirenix.OdinInspector;
 
 [ExecuteInEditMode]
 public class EnvironmentTime : MonoBehaviour {
 
     public Light mainLight;
-    public bool sceneHasWater;
-    public Material waterMaterial;
     public Material skyboxMaterial;
+    public bool sceneHasWater;
+    [ShowIf("sceneHasWater", true)] public Material waterMaterial;
+    public bool sceneHasClouds;
+    [ShowIf("sceneHasClouds", true)] public Material cloudsMaterial;
 
     public TimeColor selectedTimeColorSet;
     public bool triggerFunction = false;
@@ -30,6 +33,11 @@ public class EnvironmentTime : MonoBehaviour {
         if (sceneHasWater) {
             waterMaterial.SetColor("Color_F01C36BF", timeColorSet.waterShallow);
             waterMaterial.SetColor("Color_7D9A58EC", timeColorSet.waterDeep);
+        }
+        if(sceneHasClouds) {
+            cloudsMaterial.SetColor("Color_AD16EE5E", timeColorSet.cloudPeak);
+            cloudsMaterial.SetColor("Color_6D35BD30", timeColorSet.cloudValley);
+            cloudsMaterial.SetFloat("Vector1_3BED982A", timeColorSet.cloudFresnelOpacity);
         }
         mainLight.transform.rotation = Quaternion.Euler(timeColorSet.lightRotation);
         mainLight.color = timeColorSet.lightColor;

@@ -20,6 +20,9 @@ MonoBehaviour:
   skyboxSky: {r: 0.6509804, g: 0.43137255, b: 0.6100385, a: 1}
   waterShallow: {r: 0.43654326, g: 0.844369, b: 0.8490566, a: 1}
   waterDeep: {r: 0.827451, g: 0.6862745, b: 0.24313726, a: 1}
+  cloudPeak: {r: 1.0592737, g: 0.91507936, b: 0, a: 1}
+  cloudValley: {r: 0.74509805, g: 0.6431373, b: 0, a: 1}
+  cloudFresnelOpacity: 0.5
   lightRotation: {x: 40, y: 195, z: 0}
   lightColor: {r: 0.98039216, g: 0.9764706, b: 0.6627451, a: 1}
   lightIntensity: 1.1

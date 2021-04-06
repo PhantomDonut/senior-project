@@ -138,6 +138,7 @@ public class PlayerController : MonoBehaviour {
             if (hitSurface != null) {
                 friction = hitSurface.surfaceAttributes.friction;
                 bounceMultiplier = (int)hitSurface.surfaceAttributes.bounceMultiplier * 0.1f;
+                Debug.Log(hitSurface.transform.name);
             }
             collisionInfo.grounded = true;
         }
@@ -209,7 +210,7 @@ public class PlayerController : MonoBehaviour {
     }
 
     private void LateUpdate() {
-        debugText.text = string.Format(debugTextFormat, collisionInfo.grounded, collisionInfo.sliding, slideVelocity, movementTotal, verticalVelocity, System.Math.Round(currentSlideAcceleration, 2));
+        //debugText.text = string.Format(debugTextFormat, collisionInfo.grounded, collisionInfo.sliding, slideVelocity, movementTotal, verticalVelocity, System.Math.Round(currentSlideAcceleration, 2));
     }
 
     public void CancelMomentum() {
