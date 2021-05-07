@@ -37,14 +37,11 @@ public class PlayerController : MonoBehaviour {
     public LayerMask translucentLayers;
     [SerializeField] [Range(0, 1)] private float friction = 1;
     private float globalFrictionMultiplier = 1;
+    private Surface hitSurface;
     private Surface lastFrameSurface;
     [SerializeField] private float bounceMultiplier = 0;
     private bool justBounced = false;
     private const int BOUNCE_MINIMUM = 6;
-
-    [Header("Debug")]
-    public TextMeshProUGUI debugText;
-    private const string debugTextFormat = "Velocity: {3}\nGrounded: {0}\nSliding: {1} & {2} @ {5}\nVertical Velocity: {4}";
 
     private void Start() {
         rigidbody = GetComponent<Rigidbody>();
@@ -113,6 +110,7 @@ public class PlayerController : MonoBehaviour {
         friction /= globalFrictionMultiplier;
         frameVelocity = new Vector3(Mathf.Lerp(collisionInfo.velocityPriorFrame.x, frameVelocity.x, friction), frameVelocity.y, Mathf.Lerp(collisionInfo.velocityPriorFrame.z, frameVelocity.z, friction));
         collisionInfo.velocity = frameVelocity;
+        if(GameManager.RequestDebug) GameManager.Instance.LoadDebugArgs(hitSurface != null ? hitSurface.surfaceAttributes.name : "None", hitSurface != null ? System.Convert.ToString(hitSurface.surfaceAttributes.friction) : "n/a", hitSurface != null ? System.Convert.ToString((int)hitSurface.surfaceAttributes.bounceMultiplier) : "n/a", verticalVelocity, slideVelocity, currentSlideAcceleration, wallslideSpeed.y);
         return collisionInfo;
     }
     void CalculateForward() {
@@ -128,7 +126,7 @@ public class PlayerController : MonoBehaviour {
         friction = 1;
         bounceMultiplier = 0;
 
-        Surface hitSurface = null;
+        hitSurface = null;
         if (Physics.BoxCast(transform.position, new Vector3(bounds.extents.x, 0.0125f, bounds.extents.z), -Vector3.up, out hitInfo, transform.rotation, height + heightPadding, ground) && !justJumped) {
             if (Vector3.Distance(transform.position, hitInfo.point) < height) {
                 //Keep position leveled to the ground to prevent clipping
@@ -138,7 +136,7 @@ public class PlayerController : MonoBehaviour {
             if (hitSurface != null) {
                 friction = hitSurface.surfaceAttributes.friction;
                 bounceMultiplier = (int)hitSurface.surfaceAttributes.bounceMultiplier * 0.1f;
-                Debug.Log(hitSurface.transform.name);
+                //Debug.Log(hitSurface.transform.name);
             }
             collisionInfo.grounded = true;
         }

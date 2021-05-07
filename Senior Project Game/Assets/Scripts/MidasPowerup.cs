@@ -33,12 +33,6 @@ public class MidasPowerup : Powerup, IDestroyable {
 
     public IEnumerator DestroyObject() {
         destructionParticles.Emit(10);
-        /*float startingTime = GameManager.GameTime;
-        while (GameManager.GameTime - startingTime < COLLECTION_TIME) {
-            transform.position = Vector3.Lerp(transform.position, player.position, Mathf.InverseLerp(0, COLLECTION_TIME, GameManager.GameTime - startingTime));
-            visual.localScale *= 0.95f;
-            yield return new WaitForEndOfFrame();
-        }*/
         visual.gameObject.SetActive(false);
         yield return new WaitForSeconds(1.1f);
         Destroy(gameObject);
@@ -50,6 +44,7 @@ public class MidasPowerup : Powerup, IDestroyable {
     }
 
     public override void ApplyStatus(Player player) {
-        //player
+        player.cloakRenderer.material = capeMaterial;
+        player.ApplyPowerup(powerupIdentifier, maxTime);
     }
 }

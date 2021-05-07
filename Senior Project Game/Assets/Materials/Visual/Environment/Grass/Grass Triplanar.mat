@@ -21,7 +21,7 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: Grass Triplanar
-  m_Shader: {fileID: -6465566751694194690, guid: da23f8f635f77f843a213848bf532d39, type: 3}
+  m_Shader: {fileID: -6465566751694194690, guid: d084bbbb61e4fe04b8323fda34736d22, type: 3}
   m_ShaderKeywords: 
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
@@ -40,7 +40,15 @@ Material:
         m_Texture: {fileID: 10305, guid: 0000000000000000f000000000000000, type: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - Texture2D_7C01897A:
+        m_Texture: {fileID: 2800000, guid: 91950096d0eab4e4fbe8edec0c3027e0, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - Texture2D_8FBFCBDF:
+        m_Texture: {fileID: 2800000, guid: bd7ed4972feed0b44846ecca697c6da5, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - Texture2D_C12055B8:
         m_Texture: {fileID: 2800000, guid: bd7ed4972feed0b44846ecca697c6da5, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
@@ -153,9 +161,12 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Floats:
-    - Vector1_12164B21: 0.12
+    - Max_Angle: 45
+    - Vector1_12164B21: -0.25
     - Vector1_4200F1D7: 1
     - Vector1_431E0D1D: 0
+    - Vector1_B1EDBF3: 0
+    - Vector1_B6956B1E: 0.25
     - Vector1_F922E8F1: 0
     - _AlphaClip: 0
     - _Blend: 0

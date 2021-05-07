@@ -6,6 +6,7 @@ using Sirenix.OdinInspector;
 [ExecuteInEditMode]
 public class EnvironmentTime : MonoBehaviour {
 
+    [Header("Environmental Objects")]
     public Light mainLight;
     public Material skyboxMaterial;
     public bool sceneHasWater;
@@ -13,6 +14,7 @@ public class EnvironmentTime : MonoBehaviour {
     public bool sceneHasClouds;
     [ShowIf("sceneHasClouds", true)] public Material cloudsMaterial;
 
+    [Header("Selected Time")]
     public TimeColor selectedTimeColorSet;
     public bool triggerFunction = false;
 

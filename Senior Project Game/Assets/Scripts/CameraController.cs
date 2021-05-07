@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class CameraController : MonoBehaviour {
-
+    [HideInInspector] public bool activeFollow = true;
     public Transform positionTarget;
     public Transform rotationTarget;
 
@@ -40,6 +40,7 @@ public class CameraController : MonoBehaviour {
     }
 
     private void Update() {
+        if (GameManager.Instance.gameState != GameState.Regular || !activeFollow) return;
         if (Input.GetKeyDown(KeyCode.G)) {
             sharpRotationAngle += 45;
         }
@@ -63,6 +64,7 @@ public class CameraController : MonoBehaviour {
     }
 
     private void LateUpdate() {
+        if (GameManager.Instance.gameState != GameState.Regular || !activeFollow) return;
         MoveWithTarget(fullControl);
         trueRotationAngle = cameraTransform.rotation.eulerAngles.y;
         Vector3 levelRot = cameraTransform.rotation.eulerAngles;
@@ -97,13 +99,29 @@ public class CameraController : MonoBehaviour {
         transform.rotation = Quaternion.Slerp(transform.rotation, intendedRotation, turnSpeed * Time.deltaTime);
     }
 
-
-    public Vector3 MatrixMagicRotate(Vector3 pivot, float distance, Vector3 angles) {
-        Vector3 distance_to_target = new Vector3(0, 0, -distance); // distance the camera should be from target
-        Matrix4x4 t = Matrix4x4.TRS(pivot, Quaternion.Euler(angles), Vector3.one);
-        return t.MultiplyPoint(distance_to_target);
+    public void InstantToTarget() {
+        transform.position = positionTarget.position;
+        RaycastHit linecastHit;
+        float maxPotentialDistance = Vector3.Distance(positionTarget.position, idealTarget.position);
+        float distance = maxPotentialDistance;
+        Vector3 localCamera = cameraSettings.offsetPosition;
+        if (Physics.Linecast(positionTarget.position, idealTarget.position, out linecastHit, layerMask)) {
+            localCamera = transform.InverseTransformPoint(linecastHit.point);
+            distance = linecastHit.distance;
+        }
+        localCamera.y = Mathf.Max(maximumHeightAbove, localCamera.y);
+        cameraTransform.localPosition = localCamera;
+        idealTarget.localPosition = cameraSettings.offsetPosition;
+        cameraTransform.localRotation = Quaternion.Euler(Mathf.Lerp(18, 60, Mathf.InverseLerp(maxPotentialDistance, 0, distance)), 0, 0);
+        Quaternion intendedRotation = Quaternion.identity;
+        if (fullControl) {
+            sharpRotationAngle = chosenAngles.y;
+            intendedRotation = Quaternion.Euler(chosenAngles);
+        } else {
+            intendedRotation = Quaternion.Euler(0, sharpRotationAngle, 0);
+        }
+        transform.rotation = intendedRotation;
     }
-
 
     public void SwapCameraControllerSettings(CameraControllerSettings settings) {
         cameraSettings = (settings != null) ? settings : defaultCameraSettings;

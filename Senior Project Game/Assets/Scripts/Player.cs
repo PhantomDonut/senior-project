@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using UnityEngine.Rendering.Universal;
 
 #pragma warning disable 0649
 public class Player : MonoBehaviour {
@@ -18,8 +19,11 @@ public class Player : MonoBehaviour {
     private PlayerInputManager inputManager;
     private CollisionInfo collisionInfo;
     private PlayerController playerController;
+    private PlayerUI playerUI;
     new Rigidbody rigidbody;
     private float globalMovementModifier = 1;
+    private Vector3 savedVelocity;
+    private Vector3 savedAngularVelocity;
 
     [Header("Jumping")]
     public float maxJumpHeight = 4;
@@ -56,17 +60,13 @@ public class Player : MonoBehaviour {
     [Header("Visuals")]
     public Transform visual;
     private Animator animator;
+    public SkinnedMeshRenderer cloakRenderer;
     [HideInInspector] public CameraController playerCamera;
     float angle;
     public float visualTurnSpeed = 10;
     Quaternion targetRotation;
     public float visualMoveSpeed = 15;
     private Vector2 velocity2D;
-    [SerializeField] private Transform blobShadow;
-    //[SerializeField] private float blobShadowMaxDistance = 10;
-    [SerializeField] private AnimationCurve blobShadowOpacity;
-    private Material blobShadowMaterial;
-    const float BLOB_MAX_OPACITY = 0.625f;
     [SerializeField] private ParticleSystem footstepParticleSystem;
     [SerializeField] private ParticleSystem footstepPoofParticleSystem;
     [SerializeField] private TrailRenderer[] spinRenderers;
@@ -77,13 +77,20 @@ public class Player : MonoBehaviour {
     private bool spinQueued;
     private bool hasSpin = true;
 
+    [Header("Powerup")]
+    [SerializeField] private Material defaultCloak;
+    private string powerupIdentifier;
+    private float powerupMaxTime;
+    private float powerupStartTime;
+
     [Header("Debug")]
     public bool debug;
-    public TextMeshProUGUI jumpCounterText;
 
-    private void Start() {
+    public void InitalizePlayer() {
         inputManager = GetComponent<PlayerInputManager>();
         playerCamera = Camera.main.transform.root.GetComponent<CameraController>();
+        var cameraData = Camera.main.GetUniversalAdditionalCameraData();
+        cameraData.cameraStack.Add(GameManager.Instance.uiCamera);
 
         playerController = GetComponent<PlayerController>();
         playerController.gravity = new Vector3(0, -(2 * maxJumpHeight) / Mathf.Pow(timeToJumpApex, 2), 0);
@@ -99,10 +106,18 @@ public class Player : MonoBehaviour {
 
         animator = visual.GetComponentInChildren<Animator>();
 
-        //blobShadowMaterial = blobShadow.GetComponent<MeshRenderer>().sharedMaterial;
+        playerUI = GetComponent<PlayerUI>();
+
+        Debug.Log("player initalized");
     }
 
     private void Update() {
+        if (inputManager.MenuKeyDown) {
+            playerUI.MenuPressed(this);
+        }
+
+        if (GameManager.Instance.gameState != GameState.Regular) return;
+
         input = new Vector2(inputManager.HorizontalMotion, inputManager.VerticallMotion);
 
         if (onWall) {
@@ -132,6 +147,16 @@ public class Player : MonoBehaviour {
             jumpQueued = false;
         }
 
+        if (!string.IsNullOrEmpty(powerupIdentifier)) {
+            Debug.Log(powerupStartTime + powerupMaxTime - GameManager.GameTime);
+            if(powerupMaxTime > 0 && powerupStartTime + powerupMaxTime - GameManager.GameTime < 0) {
+                powerupIdentifier = string.Empty;
+                powerupStartTime = 0;
+                powerupMaxTime = 0;
+                cloakRenderer.material = defaultCloak;
+            }
+        }
+
         //jumpCounterText.text = string.Format("Jumps: {0} Queued: {1}", jumpsRemaining, jumpQueued);
 
         AnimatePlayer(inputManager.LateralInputExists, savedRotation);
@@ -143,6 +168,7 @@ public class Player : MonoBehaviour {
     }
 
     private void FixedUpdate() {
+        if (GameManager.Instance.gameState != GameState.Regular) return;
         running = !inputManager.Walk;
         sprinting = running && inputManager.Sprint;
         speed = running ? sprinting ? sprintSpeed : runSpeed : walkSpeed;
@@ -199,16 +225,12 @@ public class Player : MonoBehaviour {
         }
 
         if (debug) DrawDebugLines();
+        if(GameManager.RequestDebug) GameManager.Instance.LoadDebugArgs(collisionInfo.grounded, collisionInfo.groundAngle, collisionInfo.velocity, collisionInfo.sliding, globalMovementModifier, powerupIdentifier, powerupMaxTime, jumpsRemaining == baseJumps + extraJumps, jumpsRemaining, onWall);
     }
 
     private void LateUpdate() {
         Vector3 targetPosition = transform.position;
         visual.transform.position = Vector3.Lerp(visual.transform.position, targetPosition, visualMoveSpeed * Time.deltaTime);
-        /*RaycastHit blobShadowHit;
-        if (Physics.Raycast(visual.position + new Vector3(0, 0.5f, 0), -visual.transform.up, out blobShadowHit, Mathf.Infinity, playerController.ground)) {
-            blobShadow.position = new Vector3(visual.position.x, blobShadowHit.point.y, visual.position.z);
-            blobShadowMaterial.SetColor("_BaseColor", new Color(0, 0, 0, BLOB_MAX_OPACITY * blobShadowOpacity.Evaluate(Mathf.InverseLerp(0, blobShadowMaxDistance, blobShadowHit.distance - 1))));
-        }*/
     }
 
     private void CalculateDirection() {
@@ -221,9 +243,6 @@ public class Player : MonoBehaviour {
 
     private void AnimatePlayer(bool horizontalInputExists, Quaternion savedRotation) {
         animator.SetBool("Grounded", collisionInfo.grounded);
-        //animator.SetBool("Walking", horizontalInputExists & !running);
-        //animator.SetBool("Running", horizontalInputExists & running & !sprinting);
-        //animator.SetBool("Sprinting", horizontalInputExists & sprinting);
         animator.SetFloat("Horizontal Velocity", Mathf.InverseLerp(0, sprintSpeed, velocity2D.magnitude));
         animator.SetFloat("Smooth Horizontal Velocity", Mathf.InverseLerp(0, sprintSpeed, velocity2D.magnitude), 0.2f, Time.deltaTime);
         animator.SetBool("Sliding", collisionInfo.sliding);
@@ -294,6 +313,20 @@ public class Player : MonoBehaviour {
         playerController.CancelMomentum();
     }
 
+    public void ToggleMomentumPause(bool state) {
+        if(state) {
+            savedVelocity = rigidbody.velocity;
+            savedAngularVelocity = rigidbody.angularVelocity;
+            rigidbody.isKinematic = true;
+
+        } else {
+            rigidbody.isKinematic = false;
+            rigidbody.velocity = savedVelocity;
+            rigidbody.angularVelocity = savedAngularVelocity;
+            rigidbody.WakeUp();
+        }
+    }
+
     private void EnterWalljump(GameObject wall, Vector3 normal) {
         CancelMomentum();
         onWall = true;
@@ -331,7 +364,25 @@ public class Player : MonoBehaviour {
             }
             globalMovementModifier = 1;
         }
+    }
 
+    private IEnumerator Respawn() {
+        playerCamera.activeFollow = false;
+        yield return new WaitForSeconds(2.0f);
+        playerController.CancelMomentum();
+        visual.transform.position = transform.position;
+        GameManager.Instance.currentLevelManager.RespawnPlayer(this);
+    }
+
+    public void ApplyPowerup(string powerupIdentifier, float time) {
+        Debug.Log("Apply " + powerupIdentifier + " for " + time + " seconds");
+        powerupStartTime = GameManager.GameTime;
+        this.powerupIdentifier = powerupIdentifier;
+        powerupMaxTime = time;
+    }
+
+    public bool CheckPowerup(string checkType) {
+        return string.Equals(powerupIdentifier, checkType);
     }
 
     private void OnCollisionEnter(Collision collision) {
@@ -352,6 +403,9 @@ public class Player : MonoBehaviour {
         if (other.gameObject.layer == LayerMask.NameToLayer("Collectible")) {
             Collectible collectible = other.gameObject.GetComponent<Collectible>();
             if(!collectible.collected) collectible.Pickup(transform);
+        }
+        if(other.gameObject.layer == LayerMask.NameToLayer("Death Plane")) {
+            StartCoroutine(Respawn());
         }
     }
 

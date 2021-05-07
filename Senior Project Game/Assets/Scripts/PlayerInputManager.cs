@@ -21,5 +21,5 @@ public class PlayerInputManager : MonoBehaviour {
     public bool JumpKeyUp { get { return Input.GetKeyUp(JumpKey); } }
     public bool Walk { get { return Input.GetKey(WalkKey); } }
     public bool Sprint { get { return Input.GetKey(SprintKey); } }
-    public bool MenuKeyDown {  get { return Input.GetKey(Menukey); } }
+    public bool MenuKeyDown {  get { return Input.GetKeyDown(Menukey); } }
 }

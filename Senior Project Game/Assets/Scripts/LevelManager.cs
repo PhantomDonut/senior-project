@@ -9,9 +9,16 @@ public class LevelManager : MonoBehaviour {
 
     public void SetPlayer(Player player) {
         player.transform.position = startingPosition;
+        player.visual.transform.position = startingPosition;
+    }
+
+    public void RespawnPlayer(Player player) {
+        player.transform.position = startingPosition;
+        player.playerCamera.InstantToTarget();
+        player.playerCamera.activeFollow = true;
     }
 
     private void LateUpdate() {
-        if (GameManager.Instance.player != null) localScenePlayerPosition.position = GameManager.Instance.player.visual.transform.position;
+        if (GameManager.LoadedScene && GameManager.Instance.player != null) localScenePlayerPosition.position = GameManager.Instance.player.visual.transform.position;
     }
 }
