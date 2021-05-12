@@ -4,12 +4,20 @@ using UnityEngine;
 
 public class CameraControllerVolume : MonoBehaviour {
     public CameraControllerSettings volumeSettings;
+    bool entered;
 
     void OnTriggerEnter(Collider other) {
-        GameManager.Instance.player.playerCamera.SwapCameraControllerSettings(volumeSettings);
+        Debug.Log(other.name);
+        if (!entered) {
+            GameManager.Instance.player.playerCamera.SwapCameraControllerSettings(volumeSettings, true);
+            entered = true;
+        }
     }
 
     void OnTriggerExit(Collider other) {
-        GameManager.Instance.player.playerCamera.SwapCameraControllerSettings(null);
+        if (entered) {
+            GameManager.Instance.player.playerCamera.SwapCameraControllerSettings(volumeSettings, false);
+            entered = false;
+        }
     }
 }

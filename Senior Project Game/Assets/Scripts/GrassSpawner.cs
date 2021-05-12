@@ -8,7 +8,7 @@ public class GrassSpawner : MonoBehaviour
     public Transform target;
     Bounds targetBounds;
     public float density;
-    public int sideSafety = 1;
+    public float sideSafety = 1;
     public Vector2 scaleRange;
     public GameObject prefab;
     public bool trigger;
@@ -36,10 +36,10 @@ public class GrassSpawner : MonoBehaviour
         for (int i = 0; i < attempts; i++) {
             Vector3 ranPosition = new Vector3(
                 Random.Range(-safeExtentX, safeExtentX),
-                targetBounds.size.y + 1,
+                targetBounds.size.y + 100,
                 Random.Range(-safeExtentZ, safeExtentZ));
             ranPosition += target.position;
-            if (Physics.Raycast(ranPosition, -Vector3.up, out hit, targetBounds.size.y + 10)) {
+            if (Physics.Raycast(ranPosition, -Vector3.up, out hit, targetBounds.size.y + 120)) {
                 if (hit.transform == target) {
                     temp = Instantiate(prefab, hit.point, Quaternion.identity, targetGrassHolder);
                     Vector3 globalScale = Vector3.one * Random.Range(scaleRange.x, scaleRange.y);

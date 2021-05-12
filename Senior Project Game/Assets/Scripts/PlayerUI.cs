@@ -13,7 +13,7 @@ public class PlayerUI : MonoBehaviour {
         if (GameManager.Instance.gameState == GameState.Paused) {
             GameManager.Instance.gameState = lastGameState;
             pauseBlurAnimator.SetBool("Pause", false);
-            playerAnimator.speed = 1;
+            player.ToggleVisualFreeze(false);
             player.ToggleMomentumPause(false);
             GameManager.Instance.ToggleCursorVisibility(false);
         }
@@ -23,7 +23,7 @@ public class PlayerUI : MonoBehaviour {
                 GameManager.Instance.gameState = GameState.Paused;
                 pauseBlurAnimator.gameObject.SetActive(true);
                 pauseBlurAnimator.SetBool("Pause", true);
-                playerAnimator.speed = 0;
+                player.ToggleVisualFreeze(true);
                 player.ToggleMomentumPause(true);
                 GameManager.Instance.ToggleCursorVisibility(true);
             }
@@ -32,7 +32,7 @@ public class PlayerUI : MonoBehaviour {
 
     public void ExitToHub() {
         if (GameManager.CurrentSceneID != "Hub") {
-            GameManager.Instance.SwitchToLevel("Hub", true);
+            GameManager.Instance.SwitchToLevel("Hub", true, CelestialTime.Day);
         } else {
             GameManager.Instance.FullGameQuit();
         }

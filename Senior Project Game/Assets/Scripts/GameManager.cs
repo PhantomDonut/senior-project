@@ -9,7 +9,7 @@ using TMPro;
 using System;
 
 #pragma warning disable 0649
-public enum GameState {Regular, Paused, TitleScreen}
+public enum GameState {Regular, Paused, TitleScreen, Cutscene}
 public class GameManager : Singleton<GameManager> {
 
     [HideInInspector] public GameState gameState = GameState.Regular;
@@ -30,13 +30,16 @@ public class GameManager : Singleton<GameManager> {
     public Animator pauseAnimator;
     public GameObject levelTransitionScreen;
     public Animator permanentUIAnimator;
+    public TransitionManager transitionManager;
 
     static bool ExistingGameManager = false;
     new public static GameManager Instance;
 
-    private int levelLoadWait = 6;
+    private int levelLoadWait = 0;//6;
     public bool autoLoad;
     [ShowIf("autoLoad", true)] public string autoLevelToLoad;
+    public static bool FirstHubLoad = true;
+    [SerializeField] private TitleScreen titleScreen;
 
     public static bool RequestDebug;
     [SerializeField] private TextMeshProUGUI debugTextField;
@@ -56,66 +59,75 @@ public class GameManager : Singleton<GameManager> {
 
     private void Start() {
         if (autoLoad) {
-            SwitchToLevel(autoLevelToLoad, true);
+            SwitchToLevel(autoLevelToLoad, true, CelestialTime.Day);
         } else {
             //Debug.Log("Start Init");
-            Initalize(false);
+            Initalize(false, CelestialTime.Day);
             CurrentSceneID = "Hub";
         }
     }
 
-    private void Initalize(bool delayTime) {
+    private void Initalize(bool delayTime, CelestialTime celestialTime) {
         //Debug.Log("Initalized");
-        StartCoroutine(LoadComponentObjects(delayTime));
+        StartCoroutine(LoadComponentObjects(delayTime, celestialTime));
         LevelSwitch();
     }
 
-    IEnumerator LoadComponentObjects(bool delayTime) {
+    IEnumerator LoadComponentObjects(bool delayTime, CelestialTime celestialTime) {
         yield return SceneManager.LoadSceneAsync("Components", LoadSceneMode.Additive);
         var cameraData = uiCamera.GetUniversalAdditionalCameraData();
         cameraData.renderType = CameraRenderType.Overlay;
         player = GameObject.FindObjectOfType<Player>();
         player.InitalizePlayer();
         currentLevelManager.SetPlayer(player);
+        if(currentLevelManager.environmentTimeManager != null) currentLevelManager.environmentTimeManager.TriggerTimeChange(celestialTime);
         LoadedScene = true;
-        if(delayTime) yield return new WaitForSeconds(levelLoadWait);
-        //levelTransitionScreen.SetActive(false);
-        Debug.Log("Fading in FADING IN");
-        permanentUIAnimator.SetTrigger("Fade In");
-        gameState = GameState.Regular;
+        if (CurrentSceneID == "Hub") titleScreen.Initialize();
+        if (FirstHubLoad) {
+            FirstHubLoad = false;
+        } else {
+            if (delayTime) yield return new WaitForSeconds(levelLoadWait);
+            Debug.Log("Fading in FADING IN");
+            transitionManager.Fade(1.0f, false);
+            gameState = GameState.Regular;
+        }
     }
 
-    public void SwitchToLevel(string levelName, bool fade) {
-        StartCoroutine(SwitchLevelOutroAnimation(levelName, fade));
+    public void SwitchToLevel(string levelName, bool fade, CelestialTime celestialTime) {
+        gameState = GameState.Cutscene;
+        player.ToggleMomentumPause(true);
+        player.ToggleVisualFreeze(true);
+        StartCoroutine(SwitchLevelOutroAnimation(levelName, fade, celestialTime));
     }
 
-    IEnumerator SwitchLevelOutroAnimation(string levelName, bool fade) {
+    IEnumerator SwitchLevelOutroAnimation(string levelName, bool fade, CelestialTime celestialTime) {
         Debug.Log("Here and fade is " + fade);
         if (fade) {
-            permanentUIAnimator.SetTrigger("Fade Out");
+            //permanentUIAnimator.SetTrigger("Fade Out");
+            transitionManager.Fade(1.0f, true);
         } else {
-            permanentUIAnimator.SetTrigger("Portal");
-            yield return new WaitForSeconds(1.0f);
+            //permanentUIAnimator.SetTrigger("Portal");
+            transitionManager.Portal(2.5f, false);
         }
-        yield return new WaitForSeconds(1.0f);
+        yield return new WaitForSeconds(3.0f);
         LoadedScene = false;
         //levelTransitionScreen.SetActive(true);
         var cameraData = uiCamera.GetUniversalAdditionalCameraData();
         cameraData.renderType = CameraRenderType.Base;
         loadingLevel = SceneManager.LoadSceneAsync(levelName, LoadSceneMode.Single);
         CurrentSceneID = levelName;
-        StartCoroutine(WaitForSceneLoad());
+        StartCoroutine(WaitForSceneLoad(celestialTime));
     }
 
-    IEnumerator WaitForSceneLoad() {
+    IEnumerator WaitForSceneLoad(CelestialTime celestialTime) {
         while(!loadingLevel.isDone) {
             yield return new WaitForEndOfFrame();
         }
-        Initalize(true);
+        Initalize(true, celestialTime);
     }
 
     private void Update() {
-        if(gameState == GameState.Regular) {
+        if (gameState == GameState.Regular || gameState == GameState.Cutscene) {
             GameTime += Time.deltaTime;
         } 
         if(gameState != GameState.Paused && countPlayTime) {

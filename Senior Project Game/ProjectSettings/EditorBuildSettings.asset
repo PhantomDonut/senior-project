@@ -14,10 +14,10 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Grass.unity
     guid: 049271818992ab547b794a09e5887a50
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/Toy World.unity
     guid: 5937a0646953da3479e47b49e9e3df50
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/Dark World.unity
     guid: f331dd3ebddba54429f3404b3a85df94
   m_configObjects: {}

@@ -10,6 +10,7 @@ public class MotionPlatform : Surface {
     [ShowIf("enableMotion", true)] public Vector3 movementOffset;
     [ShowIf("enableMotion", true)] Vector3 startingPosition;
     [ShowIf("enableMotion", true)] [Range(0.5f, 6)] public float movementSpeed;
+    [ShowIf("enableMotion")] public float offsetTime;
     private float trueMovementSpeed;
     public bool enableRotation;
     [ShowIf("enableRotation", true)] public Vector3 rotationSpeed;
@@ -48,6 +49,7 @@ public class MotionPlatform : Surface {
     private void FixedUpdate() {
         if(enableMotion && (!lockedUntilPlayer || (lockedUntilPlayer && !motionLockedState))) {
             float time = lockedUntilPlayer ? (GameManager.GamePhysicsTime - startTime) * trueMovementSpeed : GameManager.GamePhysicsTime * trueMovementSpeed;
+            time += offsetTime;
             directionUp = (time % 2) < 1;
             transform.position = Vector3.Lerp(startingPosition, startingPosition + movementOffset, Mathf.PingPong(time, 1));
 

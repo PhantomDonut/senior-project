@@ -112,7 +112,7 @@ public class Player : MonoBehaviour {
     }
 
     private void Update() {
-        if (inputManager.MenuKeyDown) {
+        if (GameManager.Instance.gameState != GameState.Cutscene && inputManager.MenuKeyDown) {
             playerUI.MenuPressed(this);
         }
 
@@ -325,6 +325,10 @@ public class Player : MonoBehaviour {
             rigidbody.angularVelocity = savedAngularVelocity;
             rigidbody.WakeUp();
         }
+    }
+
+    public void ToggleVisualFreeze(bool state) {
+        animator.speed = state ? 0 : 1;
     }
 
     private void EnterWalljump(GameObject wall, Vector3 normal) {

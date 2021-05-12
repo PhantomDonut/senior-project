@@ -4,7 +4,16 @@ using UnityEngine;
 using Sirenix.OdinInspector;
 
 [ExecuteInEditMode]
+public enum CelestialTime { Day = 0, Sunset = 1, Night = 2 }
 public class EnvironmentTime : MonoBehaviour {
+    [Header("Time Objects")]
+    public static CelestialTime CurrentTime = CelestialTime.Day;
+    TimeObject[] gameColorObjects;
+    [ColorUsageAttribute(true, true)] public Color dayColor;
+    [ColorUsageAttribute(true, true)] public Color sunsetColor;
+    [ColorUsageAttribute(true, true)] public Color nightColor;
+    private static Color[] timeColors;
+
 
     [Header("Environmental Objects")]
     public Light mainLight;
@@ -15,14 +24,38 @@ public class EnvironmentTime : MonoBehaviour {
     [ShowIf("sceneHasClouds", true)] public Material cloudsMaterial;
 
     [Header("Selected Time")]
-    public TimeColor selectedTimeColorSet;
+    public TimeColor[] timeColorSets;
+    public CelestialTime setTimeValue;
     public bool triggerFunction = false;
+
+
+    private void Start() {
+        gameColorObjects = FindObjectsOfType<TimeObject>();
+        timeColors = new Color[] { dayColor, sunsetColor, nightColor};
+    }
 
     void Update() {
         if(triggerFunction) {
             triggerFunction = false;
-            UpdateSceneTime(selectedTimeColorSet);
+            TriggerTimeChange(setTimeValue);
         }
+    }
+
+    public void TriggerTimeChange(CelestialTime time) {
+        CurrentTime = time;
+        if(Application.isPlaying) UpdateAllTimeObjects((int)CurrentTime);
+        UpdateSceneTime(timeColorSets[(int)CurrentTime]);
+    }
+
+    public void UpdateAllTimeObjects(int time) {
+        CurrentTime = (CelestialTime)time;
+        for (int i = 0; i < gameColorObjects.Length; i++) {
+            gameColorObjects[i].TimeUpdate();
+        }
+    }
+
+    public static Color FetchTimeColor(int time) {
+        return timeColors[time];
     }
 
     void UpdateSceneTime(TimeColor timeColorSet) {

@@ -25,18 +25,24 @@ public class CameraController : MonoBehaviour {
     public float trueRotationAngle;
 
     public CameraControllerSettings defaultCameraSettings;
-    [HideInInspector]
-    public CameraControllerSettings cameraSettings;
+    [HideInInspector] public CameraControllerSettings cameraSettings;
+    private List<CameraControllerSettings> cameraSettingsEntered = new List<CameraControllerSettings>();
 
     bool fullControl;
     Vector3 chosenAngles;
     Vector3 idealPosition;
 
+    bool started = false;
+
     private void Start() {
-        cameraSettings = defaultCameraSettings;
+        if (started) return;
+        started = true;
+        //cameraSettings = defaultCameraSettings;
+        SwapCameraControllerSettings(defaultCameraSettings, true);
         //offsetPosition = cameraSettings.offsetPosition;
         cameraTransform = Camera.main.transform;
         idealTarget = GameObject.Find("Ideal Position").transform;
+
     }
 
     private void Update() {
@@ -100,6 +106,7 @@ public class CameraController : MonoBehaviour {
     }
 
     public void InstantToTarget() {
+        if (!started) Start();
         transform.position = positionTarget.position;
         RaycastHit linecastHit;
         float maxPotentialDistance = Vector3.Distance(positionTarget.position, idealTarget.position);
@@ -123,8 +130,23 @@ public class CameraController : MonoBehaviour {
         transform.rotation = intendedRotation;
     }
 
-    public void SwapCameraControllerSettings(CameraControllerSettings settings) {
-        cameraSettings = (settings != null) ? settings : defaultCameraSettings;
+    public void SwapCameraControllerSettings(CameraControllerSettings settings, bool add) {
+        if(add) {
+            cameraSettingsEntered.Add(settings);
+        } else {
+            cameraSettingsEntered.Remove(settings);
+        }
+
+        int i = cameraSettingsEntered.Count - 1;
+        bool foundCameraSettings = false;
+        while (i > -1 && !foundCameraSettings) {
+            if (cameraSettingsEntered[i] != null) {
+                cameraSettings = cameraSettingsEntered[i];
+                foundCameraSettings = true;
+            }
+            i--;
+        }
+        //cameraSettings = (settings != null) ? settings : defaultCameraSettings;
         if(cameraSettings.angleOverride) {
             sharpRotationAngle = cameraSettings.sharpRotationAngle;
             chosenAngles.y = sharpRotationAngle;
