@@ -58,7 +58,7 @@ Material:
     - Vector1_48A8130: 5
     - Vector1_5006A6DB: 0
     - Vector1_58F7CCC1: 1
-    - Vector1_6E1A052F: 0
+    - Vector1_6E1A052F: 6
     - Vector1_7E1AD4D6: 1
     - Vector1_8038C85: 1
     - Vector1_8AB010D0: 1
@@ -111,7 +111,7 @@ Material:
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _GroundColor: {r: 0.36899996, g: 0.34899998, b: 0.34099993, a: 1}
     - _HorizonColor: {r: 1, g: 1, b: 1, a: 0}
-    - _SkyColor: {r: 0.085643165, g: 0.05882348, b: 0.9333333, a: 0}
+    - _SkyColor: {r: 0.5268671, g: 0.0588235, b: 0.93333334, a: 0}
     - _SkyTint: {r: 0.5, g: 0.5, b: 0.5, a: 1}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
     - _SunDirection: {r: 0, g: 1, b: 0, a: 0}

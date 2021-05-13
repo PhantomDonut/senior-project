@@ -82,7 +82,10 @@ public class GameManager : Singleton<GameManager> {
         currentLevelManager.SetPlayer(player);
         if(currentLevelManager.environmentTimeManager != null) currentLevelManager.environmentTimeManager.TriggerTimeChange(celestialTime);
         LoadedScene = true;
-        if (CurrentSceneID == "Hub") titleScreen.Initialize();
+        if (CurrentSceneID == "Hub") {
+            titleScreen = FindObjectOfType<TitleScreen>();
+            titleScreen.Initialize();
+        }
         if (FirstHubLoad) {
             FirstHubLoad = false;
         } else {

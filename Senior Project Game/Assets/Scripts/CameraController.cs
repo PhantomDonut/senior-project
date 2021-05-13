@@ -147,12 +147,12 @@ public class CameraController : MonoBehaviour {
             i--;
         }
         //cameraSettings = (settings != null) ? settings : defaultCameraSettings;
-        if(cameraSettings.angleOverride) {
+        if(cameraSettings.angleOverride || !fullControl) {
             sharpRotationAngle = cameraSettings.sharpRotationAngle;
             chosenAngles.y = sharpRotationAngle;
             chosenAngles.x = 0;
         }
-        fullControl = cameraSettings.allowControl;
+        if(!cameraSettings.allowControl) fullControl = false;
     }
 }
 

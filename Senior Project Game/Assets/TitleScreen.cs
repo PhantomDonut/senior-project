@@ -14,9 +14,7 @@ public class TitleScreen : MonoBehaviour {
     private bool motionPulse;
     [SerializeField] private Transform titleText;
     [SerializeField] [Range(0, 10f)] private float titleBounceSpeed = 1;
-    [SerializeField] private TextMeshProUGUI startText;
-    private Color32 startTextColor;
-    [SerializeField] [Range(0, 0.5f)] private float startTextOpacityRange = 0.2f;
+    [SerializeField] private Transform startText;
     
     public void Initialize() {
         if(GameManager.FirstHubLoad) {
@@ -27,7 +25,6 @@ public class TitleScreen : MonoBehaviour {
             playerCamera = trueCamController.cameraTransform;
             playerCamera.transform.position = new Vector3(0, 15, -20);
             playerCamera.transform.eulerAngles = new Vector3(-20, 0, 0);
-            startTextColor = new Color32(255, 255, 255, 255);
             StartCoroutine(WaitForFadeUp());
         } else {
             titleScreen.enabled = false;
@@ -44,9 +41,8 @@ public class TitleScreen : MonoBehaviour {
     }
     
     private void MotionPulse() {
-        startTextColor.a = (byte)(255f * (1f - Mathf.PingPong(Time.time, startTextOpacityRange)));
-        startText.color = startTextColor;
         titleText.localScale = Vector3.one * (1 - Mathf.PingPong(Time.time / 10f * titleBounceSpeed, 0.1f));
+        startText.localScale = Vector3.one * (1 - Mathf.PingPong(Time.time / 5f * titleBounceSpeed, 0.2f));
     }
 
     IEnumerator WaitForFadeUp() {
