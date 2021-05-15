@@ -71,6 +71,12 @@ public class Player : MonoBehaviour {
     [SerializeField] private ParticleSystem footstepPoofParticleSystem;
     [SerializeField] private TrailRenderer[] spinRenderers;
 
+    [Header("Audio")]
+    [SerializeField] private AudioSource jumpSound;
+    [SerializeField] private AudioSource fallSound;
+    [SerializeField] private AudioSource spinSound;
+
+
     [Header("Interaction")]
     public bool justTeleported;
     private bool spinning;
@@ -178,6 +184,7 @@ public class Player : MonoBehaviour {
             jumpQueued = false;
             StartCoroutine(JumpReset());
             validJump = true;
+            jumpSound.Play();
             jumpsRemaining--;
         }
 
@@ -190,6 +197,7 @@ public class Player : MonoBehaviour {
         //Landing Frame
         if (!collisionInfo.groundedLastFrame && collisionInfo.grounded) {
             StartCoroutine(Landing());
+            fallSound.Play();
             footstepParticleSystem.Play();
             footstepPoofParticleSystem.Emit(20);
         }
@@ -268,6 +276,7 @@ public class Player : MonoBehaviour {
         hasSpin = false;
         animator.SetTrigger("Spin");
         animator.SetBool("Disable Transition", true);
+        spinSound.Play();
         yield return new WaitForSeconds(0.1f);
         for(int i = 0; i < spinRenderers.Length; i++) {
             spinRenderers[i].emitting = true;

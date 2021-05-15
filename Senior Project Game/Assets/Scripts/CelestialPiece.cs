@@ -32,9 +32,10 @@ public class CelestialPiece : Collectible, IDestroyable {
     public IEnumerator DestroyObject() {
         destructionParticles.Emit(10);
         visual.gameObject.SetActive(false);
-        yield return new WaitForSeconds(1.5f);
+        yield return new WaitForSeconds(3f);
         GameManager.Instance.SwitchToLevel("Hub", true, CelestialTime.Day);
-        Destroy(gameObject);
+        GameManager.Instance.gameState = GameState.Cutscene;
+        //Destroy(gameObject);
     }
 
     public override void SetPhysicsState(bool state) {

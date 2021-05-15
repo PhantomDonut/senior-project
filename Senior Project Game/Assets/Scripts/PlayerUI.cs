@@ -8,8 +8,10 @@ public class PlayerUI : MonoBehaviour {
 
     [SerializeField] private Animator pauseBlurAnimator = default;
     [SerializeField] private Animator playerAnimator = default;
+    [SerializeField] private AudioSource pauseNoise = default;
 
     public void MenuPressed(Player player) {
+        pauseNoise.Play();
         if (GameManager.Instance.gameState == GameState.Paused) {
             GameManager.Instance.gameState = lastGameState;
             pauseBlurAnimator.SetBool("Pause", false);

@@ -6,6 +6,7 @@ public class Crate : MonoBehaviour, IHittable, IDestroyable {
     new public BoxCollider collider;
     public MeshRenderer meshRenderer;
     public ParticleSystem destructionParticles;
+    private AudioSource breakSound;
     public float hitsRemaining = 1;
     float timeLastHit;
 
@@ -13,6 +14,7 @@ public class Crate : MonoBehaviour, IHittable, IDestroyable {
         collider = GetComponent<BoxCollider>();
         meshRenderer = GetComponent<MeshRenderer>();
         destructionParticles = GetComponentInChildren<ParticleSystem>();
+        breakSound = GetComponent<AudioSource>();
     }
 
     public void Hit() {
@@ -28,11 +30,12 @@ public class Crate : MonoBehaviour, IHittable, IDestroyable {
         collider.enabled = false;
         meshRenderer.enabled = false;
         destructionParticles.Emit(100);
+        breakSound.Play();
 
         float ve = 3;
 
         GameManager.Instance.currentLevelManager.poolManager.FetchPooledMulti("Coin", 4, transform.position, null, new Vector3(-ve, 3, -ve), new Vector3(ve, 5, ve));
-        yield return new WaitForSeconds(1.1f);
+        yield return new WaitForSeconds(2.5f);
         Destroy(gameObject);
     }
 

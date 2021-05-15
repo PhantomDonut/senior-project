@@ -7,6 +7,7 @@ using UnityEngine.SceneManagement;
 using Sirenix.OdinInspector;
 using TMPro;
 using System;
+using System.Linq;
 
 #pragma warning disable 0649
 public enum GameState {Regular, Paused, TitleScreen, Cutscene}
@@ -55,6 +56,7 @@ public class GameManager : Singleton<GameManager> {
         Instance = this;
         DontDestroyOnLoad(gameObject);
         debugArgs = new string[17];
+        ToggleCursorVisibility(false);
     }
 
     private void Start() {
@@ -139,6 +141,12 @@ public class GameManager : Singleton<GameManager> {
         if(Input.GetKeyDown(KeyCode.Alpha0)) {
             RequestDebug = !RequestDebug;
             debugTextField.gameObject.SetActive(RequestDebug);
+        }
+        if(Input.GetKeyDown(KeyCode.Alpha9)) {
+            GameObject[] grass = Resources.FindObjectsOfTypeAll<GameObject>().Where(obj => obj.name == "Grass Holder").ToArray();
+            for(int i = 0; i < grass.Length; i++) {
+                grass[i].SetActive(false);
+            }
         }
     }
 

@@ -13,7 +13,7 @@ public class TitleScreen : MonoBehaviour {
     private bool canActivate;
     private bool motionPulse;
     [SerializeField] private Transform titleText;
-    [SerializeField] [Range(0, 10f)] private float titleBounceSpeed = 1;
+    [SerializeField] [Range(0, 10f)] private float textBounceSpeed = 1;
     [SerializeField] private Transform startText;
     
     public void Initialize() {
@@ -24,7 +24,7 @@ public class TitleScreen : MonoBehaviour {
             trueCamController.enabled = false;
             playerCamera = trueCamController.cameraTransform;
             playerCamera.transform.position = new Vector3(0, 15, -20);
-            playerCamera.transform.eulerAngles = new Vector3(-20, 0, 0);
+            playerCamera.transform.eulerAngles = new Vector3(-85, 0, 0);
             StartCoroutine(WaitForFadeUp());
         } else {
             titleScreen.enabled = false;
@@ -37,12 +37,15 @@ public class TitleScreen : MonoBehaviour {
             canActivate = false;
             StartCoroutine(MoveIntoGame());
         }
+    }
+
+    private void LateUpdate() {
         if (motionPulse) MotionPulse();
     }
     
     private void MotionPulse() {
-        titleText.localScale = Vector3.one * (1 - Mathf.PingPong(Time.time / 10f * titleBounceSpeed, 0.1f));
-        startText.localScale = Vector3.one * (1 - Mathf.PingPong(Time.time / 5f * titleBounceSpeed, 0.2f));
+        //titleText.localScale = Vector3.one * (1 - Mathf.PingPong(Time.time / 10f * titleBounceSpeed, 0.1f));
+        startText.localScale = Vector3.one * (1 - Mathf.PingPong(Time.time / 5f * textBounceSpeed, 0.1f));
     }
 
     IEnumerator WaitForFadeUp() {
@@ -62,7 +65,7 @@ public class TitleScreen : MonoBehaviour {
         float startingTime = Time.time;
         while(Time.time < startingTime + 4.0) {
             playerCamera.transform.position = Vector3.Lerp(startPos, endPos, Mathf.InverseLerp(startingTime, startingTime + 4, Time.time));
-            playerCamera.transform.rotation = Quaternion.Euler(Mathf.Lerp(-20, 18, Mathf.InverseLerp(startingTime, startingTime + 4, Time.time)), 0, 0);
+            playerCamera.transform.rotation = Quaternion.Euler(Mathf.Lerp(-85, 18, Mathf.InverseLerp(startingTime, startingTime + 4, Time.time)), 0, 0);
             yield return new WaitForEndOfFrame();
         }
         trueCamController.enabled = true;
